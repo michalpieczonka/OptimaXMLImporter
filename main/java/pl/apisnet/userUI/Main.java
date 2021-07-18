@@ -1,0 +1,37 @@
+package pl.apisnet.userUI;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+public class Main extends Application {
+
+    private Stage loginStage;
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        this.loginStage = primaryStage;
+        openLoginScreen();
+     //  Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+     //  primaryStage.setTitle("Hello World");
+     //  primaryStage.setScene(new Scene(root, 300, 275));
+     //  primaryStage.show();
+    }
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    private void openLoginScreen() throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource(("loginScreen.fxml")));
+        loginStage.setTitle("AXMLImporter");
+        loginStage.setScene(new Scene(root, 450, 520));
+        loginStage.show();
+
+    }
+}
