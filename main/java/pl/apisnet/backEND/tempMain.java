@@ -8,8 +8,9 @@ public class tempMain {
         System.out.println(mainOptima.connectToOptima());
 
         System.out.println("Parsowanie:::::");
-        XMLIHurtParser iHurt = new XMLIHurtParser("FS_8642_2021_RST_f.xml",mainOptima);
+        XMLIHurtParser iHurt = new XMLIHurtParser("testXMLFile.xml",mainOptima);
         iHurt.readXmlFileHeaders();
+        iHurt.addNewPZ();
 
     }
 }

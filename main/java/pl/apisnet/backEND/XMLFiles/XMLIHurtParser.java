@@ -34,7 +34,7 @@ public class XMLIHurtParser implements XMLInterface {
     private NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
     private Optima mainOptima;
 
-    private List<Object> PZItemsList;
+    private List<IHurtXMLPZPosition> PZItemsList;
 
     /**
      * Parameters (Path_To_xml_file, global instance of Optima class Object)
@@ -72,7 +72,7 @@ public class XMLIHurtParser implements XMLInterface {
                     }
                 }
             }
-            addNewPZ(PZItemsList);
+            //addNewPZ(PZItemsList);
 
 
         }catch (ParserConfigurationException e){
@@ -112,9 +112,9 @@ public class XMLIHurtParser implements XMLInterface {
      * Parameters - list of items in XML file
      */
     @Override
-    public void addNewPZ(List<Object> listOfItems) {
-        int listOfItemsSize = listOfItems.size();
-        IHurtXMLPZPosition[] tab = listOfItems.toArray(new IHurtXMLPZPosition[0]);
+    public void addNewPZ() {
+        int listOfItemsSize = PZItemsList.size();
+        IHurtXMLPZPosition[] tab = PZItemsList.toArray(new IHurtXMLPZPosition[0]);
         SafeArray eansArray = new SafeArray (Variant.VariantString,listOfItemsSize);
         SafeArray amountArray = new SafeArray (Variant.VariantInt, listOfItemsSize);
         SafeArray pricesArray = new SafeArray (Variant.VariantDouble, listOfItemsSize);
@@ -133,15 +133,12 @@ public class XMLIHurtParser implements XMLInterface {
 
     //Getters and setters section
 
-    Document getXmlFile() {
-        return xmlFile;
-    }
 
     Optima getMainOptima() {
         return mainOptima;
     }
 
-    List<Object> getPZItemsList() {
+    List<IHurtXMLPZPosition> getPZItemsList() {
         return PZItemsList;
     }
 
@@ -149,19 +146,5 @@ public class XMLIHurtParser implements XMLInterface {
         return optimaFindEanClassName;
     }
 
-    String getOptimaAddNewItemClassName() {
-        return optimaAddNewItemClassName;
-    }
 
-    String getOptimaAddNewPzClassName() {
-        return optimaAddNewPzClassName;
-    }
-
-    String getXmlFilePath() {
-        return xmlFilePath;
-    }
-
-    NodeList getElementsInXml_Pozycja() {
-        return elementsInXml_Pozycja;
-    }
 }

@@ -26,10 +26,11 @@ public interface XMLInterface {
     /**
      * Method responsible for creating new PZ Document in Optima, using DLL (OptimaLIBB)
      */
-    void addNewPZ(List<Object> itemList);
+    void addNewPZ();
 
     /**
      * Additional method responsible for sending communication to userUI
      */
     void notification();
+
 }
