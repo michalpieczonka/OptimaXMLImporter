@@ -19,7 +19,7 @@
             <DropShadow />
          </effect>
          <children>
-            <JFXComboBox fx:id="optimaCompanyName" layoutX="118.0" layoutY="177.0" prefHeight="38.0" prefWidth="200.0">
+            <JFXComboBox fx:id="optimaCompanyName" layoutX="124.0" layoutY="177.0" prefHeight="38.0" prefWidth="200.0">
                <effect>
                   <DropShadow>
                      <color>
@@ -28,7 +28,7 @@
                   </DropShadow>
                </effect>
             </JFXComboBox>
-            <TextField fx:id="optimaOperatorField" layoutX="118.0" layoutY="138.0" prefHeight="25.0" prefWidth="200.0" style="-fx-background-radius: 10px;">
+            <TextField fx:id="optimaOperatorField" layoutX="124.0" layoutY="128.0" prefHeight="25.0" prefWidth="200.0" style="-fx-background-radius: 10px;">
                <effect>
                   <DropShadow>
                      <color>
@@ -37,7 +37,7 @@
                   </DropShadow>
                </effect>
             </TextField>
-            <Label fx:id="operatorLabel" layoutX="21.0" layoutY="134.0" prefHeight="25.0" prefWidth="68.0" text="Operator" AnchorPane.leftAnchor="30.0">
+            <Label fx:id="operatorLabel" layoutX="30.0" layoutY="128.0" prefHeight="25.0" prefWidth="68.0" text="Operator" AnchorPane.leftAnchor="30.0">
                <font>
                   <Font name="Arial Bold" size="16.0" />
                </font>
@@ -72,23 +72,21 @@
                   <Image url="@logoIMG/optima-logo.png" />
                </image>
             </ImageView>
-            <Label fx:id="firmLabel1" layoutX="14.0" layoutY="248.0" prefHeight="25.0" prefWidth="222.0" text="Katalog instalacyjny">
+            <JFXButton fx:id="optimaDirButton" buttonType="RAISED" layoutX="234.0" layoutY="254.0" onAction="#setOptimaDirectory" prefHeight="25.0" prefWidth="86.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 8px;" text="Wybierz">
                <font>
-                  <Font name="Arial Bold" size="16.0" />
+                  <Font name="System Bold" size="12.0" />
                </font>
-               <padding>
-                  <Insets top="5.0" />
-               </padding>
                <effect>
-                  <DropShadow>
-                     <color>
-                        <Color opacity="0.18000000715255737" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Label>
-            <JFXButton fx:id="optimaDirButton" buttonType="RAISED" layoutX="202.0" layoutY="254.0" onAction="#setOptimaDirectory" prefHeight="25.0" prefWidth="116.0" text="Wybierz" />
-            <JFXButton fx:id="optimaLoginButton" buttonType="RAISED" layoutX="111.0" layoutY="328.0" onAction="#loginToOptima" prefHeight="25.0" prefWidth="140.0" text="Zaloguj" />
+                  <DropShadow />
+               </effect></JFXButton>
+            <JFXButton fx:id="optimaLoginButton" buttonType="RAISED" layoutX="97.0" layoutY="322.0" onAction="#loginToOptima" prefHeight="32.0" prefWidth="160.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 12px;" text="Zaloguj">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow />
+               </effect></JFXButton>
+            <TextField fx:id="optimaInstallationDir" layoutX="38.0" layoutY="254.0" prefHeight="25.0" prefWidth="173.0" promptText="Wybierz katalog Optimy" style="-fx-background-radius: 10px;" AnchorPane.leftAnchor="30.0" />
          </children>
       </AnchorPane>
       <ImageView fitHeight="58.0" fitWidth="200.0" layoutX="113.0" layoutY="450.0" pickOnBounds="true" preserveRatio="true">

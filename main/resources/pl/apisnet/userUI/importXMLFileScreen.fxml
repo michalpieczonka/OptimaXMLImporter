@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" style="-fx-background-image: url(pl/apisnet/userUI/readXMLbg.png);" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.apisnet.userUI.ImportXMLFileScreenController">
+   <children>
+      <TableView fx:id="itemsTable" layoutX="245.0" layoutY="97.0" prefHeight="408.0" prefWidth="754.0" AnchorPane.rightAnchor="25.0">
+        <columns>
+          <TableColumn prefWidth="75.0" text="C1" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>
+      <ImageView fitHeight="109.0" fitWidth="200.0" layoutX="412.0" layoutY="628.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@logoIMG/logo1.png" />
+         </image>
+      </ImageView>
+      <JFXButton fx:id="exitButton" buttonType="RAISED" layoutX="853.0" layoutY="710.0" onAction="#exit" prefHeight="29.0" prefWidth="132.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 10px;" text="Wyjście" AnchorPane.rightAnchor="50.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <ProgressBar fx:id="progressBar" layoutX="374.0" layoutY="550.0" prefHeight="18.0" prefWidth="477.0" progress="0.0" />
+      <Label fx:id="tableDesc" layoutX="551.0" layoutY="63.0" prefHeight="17.0" prefWidth="143.0" text="Wczytane dane">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="57.0" layoutY="87.0" prefHeight="21.0" prefWidth="160.0" text="Zalogowano do firmy:">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="121.0" layoutY="122.0" text="Label">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="29.0" fitWidth="33.0" layoutX="22.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@logoIMG/optima-mini-logo.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="61.0" layoutY="197.0" prefHeight="21.0" prefWidth="120.0" text="Dostępne opcje:">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="iHurtButton" buttonType="RAISED" layoutX="61.0" layoutY="240.0" onAction="#importIHurt" prefHeight="38.0" prefWidth="160.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 10px;" text="Import XML (IHurt)">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <JFXButton fx:id="subiektButton" buttonType="RAISED" layoutX="61.0" layoutY="301.0" onAction="#importSubiekt" prefHeight="38.0" prefWidth="160.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 10px;" text="Import XML (SubiektGT)">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <JFXButton fx:id="excelButton" buttonType="RAISED" layoutX="61.0" layoutY="365.0" onAction="#importExcel" prefHeight="38.0" prefWidth="160.0" style="-fx-background-color: #61a1c7; -fx-background-radius: 10px;" text="Import XLSX (Excel)">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="585.0" layoutY="526.0" text="Postęp" />
+   </children>
+</AnchorPane>

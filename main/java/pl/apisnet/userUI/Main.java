@@ -16,10 +16,6 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         this.loginStage = primaryStage;
         openLoginScreen();
-     //  Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-     //  primaryStage.setTitle("Hello World");
-     //  primaryStage.setScene(new Scene(root, 300, 275));
-     //  primaryStage.show();
     }
 
 
@@ -31,6 +27,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource(("loginScreen.fxml")));
         loginStage.setTitle("AXMLImporter");
         loginStage.setScene(new Scene(root, 450, 520));
+        loginStage.setResizable(false);
         loginStage.show();
 
     }
