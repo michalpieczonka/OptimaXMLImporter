@@ -14,6 +14,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
+import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,7 +35,8 @@ public class XMLIHurtParser implements XMLInterface {
     private NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
     private Optima mainOptima;
 
-    private List<IHurtXMLPZPosition> PZItemsList;
+    //private List<IHurtXMLPZPosition> PZItemsList;
+    private List<XMLPZPosition> PZItemsList;
 
     /**
      * Parameters (Path_To_xml_file, global instance of Optima class Object)
@@ -64,11 +66,11 @@ public class XMLIHurtParser implements XMLInterface {
                     if (!checkIfEanNumbersExists(Pozycja.getAttribute("KOD_KRESKOWY"))){
                         //Add new Item to Optima , then add this item to items list in PZ
                         addNewEan(Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("SYMBOL"), Pozycja.getAttribute("NAZWA_TOWARU"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), Pozycja.getAttribute("J_EW"));
-                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY")));
+                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU")));
                     }
                     else{
                         //If item is already in Optima, then only add this item to items list in PZ
-                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY")));
+                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU")));
                     }
                 }
             }
@@ -138,7 +140,7 @@ public class XMLIHurtParser implements XMLInterface {
         return mainOptima;
     }
 
-    List<IHurtXMLPZPosition> getPZItemsList() {
+    public List<XMLPZPosition> getPZItemsList() {
         return PZItemsList;
     }
 

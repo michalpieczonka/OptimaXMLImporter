@@ -1,6 +1,5 @@
 package pl.apisnet.backEND.XMLFiles;
 
-import java.util.List;
 
 /**
  * Interface responsible for all XMLParsers

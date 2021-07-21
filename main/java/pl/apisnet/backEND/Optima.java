@@ -67,4 +67,7 @@ public class Optima {
     public ActiveXComponent getOptimaProgramID() {
         return optimaProgramID;
     }
+    public String getOptimaCompanyName() {
+        return optimaCompanyName;
+    }
 }

@@ -80,8 +80,6 @@ public class LoginScreenController implements Initializable {
             mainOptima = new Optima(optimaOperatorField.getText(),"",optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
 
             if (mainOptima.connectToOptima()){
-                mainOptima.disconnectFromOptima();
-
                 optimaMain = OptimaHolder.getInstance();
                 optimaMain.setMainOptima(mainOptima);
                 try{
