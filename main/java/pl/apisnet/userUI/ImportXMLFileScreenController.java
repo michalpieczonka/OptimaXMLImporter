@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLIHurtParser;
+import pl.apisnet.backEND.XMLFiles.XMLInterface;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
@@ -22,17 +23,21 @@ import java.util.ResourceBundle;
 
 public class ImportXMLFileScreenController implements Initializable {
 
+    //Global optima objects
     OptimaHolder optimaHolderInstance = OptimaHolder.getInstance();
     Optima mainOptima;
 
-    FileChooser fileChooser;
-    String fileToImportPath;
+    FileChooser fileChooser; //Global object for choosing File
+    String fileToImportPath; //Path to selected file by User
+
+    XMLInterface importer;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mainOptima = optimaHolderInstance.getMainOptima();
         optimaFirmName.setText(mainOptima.getOptimaCompanyName());
         processImportButton.setVisible(false);
+        processButton.setVisible(false);
         itemsTable.getColumns().clear();
     }
 
@@ -47,6 +52,8 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private JFXButton exitButton;
 
+    @FXML
+    private JFXButton processButton;
 
     @FXML
     private Label tableDesc;
@@ -66,27 +73,27 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private JFXButton processImportButton;
 
+//Exiting from app
     @FXML
     void exit(ActionEvent event) {
 
     }
 
-    @FXML
-    void startImporting(ActionEvent event) {
-        processImport();
-    }
-
+//Buttons controllers - responsible for importing actions
+//Import from EXCEL
     @FXML
     void importExcel(ActionEvent event) {
         selectXmlFile();
     }
 
+//Import from iHurt
     @FXML
     void importIHurt(ActionEvent event) {
         selectXmlFile();
         if(!fileToImportPath.isBlank()){
             processImportButton.setVisible(true);
-            processImportButton.setText("Wygeneruj\n przyjęcie zewnętrzne");
+            importer = new XMLIHurtParser(fileToImportPath, mainOptima);
+
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XML !");
             alert.setHeaderText("  Brak pliku !");
@@ -94,9 +101,40 @@ public class ImportXMLFileScreenController implements Initializable {
         }
     }
 
+//Import from Subiekt
     @FXML
     void importSubiekt(ActionEvent event) {
         selectXmlFile();
+    }
+
+
+//2 additional buttons responsible for reading from XML file and Processing readed data into Optima
+//ActionListener for importing XML file button -> When clicking import data from XML to App starts.
+    @FXML
+    void startImporting(ActionEvent event) {
+        processImport();
+    }
+
+//ActionListener for importing readed data (into Lists) to Optima
+    @FXML
+    void processFileToOptima(ActionEvent event) {
+
+    }
+
+
+
+//Aditional methods sections
+    /**
+     * Method responsible for reading path to XML-file selected by User.
+     */
+    private void selectXmlFile(){
+        fileChooser = new FileChooser();
+        fileChooser.setTitle("Wskaż plik XML: ");
+        File file = fileChooser.showOpenDialog(mainAnchorPane.getScene().getWindow());
+        if (file !=null){
+            processImportButton.setText("Wczytaj plik\n"+file.getName()+"\n do programu");
+            fileToImportPath = file.getAbsolutePath();
+        }
     }
 
 
@@ -121,19 +159,11 @@ public class ImportXMLFileScreenController implements Initializable {
 
     }
 
-    /**
-     * Method responsible for reading path to XML-file selected by User.
-     */
-    private void selectXmlFile(){
-        fileChooser = new FileChooser();
-        fileChooser.setTitle("Wskaż plik XML: ");
-        File file = fileChooser.showOpenDialog(mainAnchorPane.getScene().getWindow());
-        if (file !=null){
-            fileToImportPath = file.getAbsolutePath();
-        }
-    }
+
 
     void insertDataIntoTable(List<XMLPZPosition> itemsInXML){
+        itemsTable.getColumns().clear();
+
         ObservableList<XMLPZPosition> itemsInTable = FXCollections.observableArrayList(itemsInXML);
 
         TableColumn<XMLPZPosition,String> eanColumn = new TableColumn<>("EAN");
@@ -155,14 +185,10 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             protected void updateItem(XMLPZPosition item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || ((IHurtXMLPZPosition)(item)).getEAN().equals("5904000044710"))
+                if (item == null || ((IHurtXMLPZPosition)(item)).getIsAlreadyInOptima())
                     setStyle("-fx-background-color: #baffba;");
-               // else if (item.getValue() > 0)
-                //    setStyle("-fx-background-color: #baffba;");
-             //   else if (item.getValue() < 0)
-              //      setStyle("-fx-background-color: #ffd7d1;");
                 else
-                    setStyle("");
+                    setStyle("-fx-background-color: #CD5C5C;");
             }
         });
     }

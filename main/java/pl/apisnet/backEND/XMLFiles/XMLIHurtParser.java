@@ -65,12 +65,12 @@ public class XMLIHurtParser implements XMLInterface {
                     //If item with given EAN number not exists
                     if (!checkIfEanNumbersExists(Pozycja.getAttribute("KOD_KRESKOWY"))){
                         //Add new Item to Optima , then add this item to items list in PZ
-                        addNewEan(Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("SYMBOL"), Pozycja.getAttribute("NAZWA_TOWARU"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), Pozycja.getAttribute("J_EW"));
-                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU")));
+                        //addNewEan(Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("SYMBOL"), Pozycja.getAttribute("NAZWA_TOWARU"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), Pozycja.getAttribute("J_EW"));
+                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), false));
                     }
                     else{
                         //If item is already in Optima, then only add this item to items list in PZ
-                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU")));
+                        PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")),true));
                     }
                 }
             }
@@ -129,9 +129,17 @@ public class XMLIHurtParser implements XMLInterface {
     }
 
     @Override
-    public void notification() {
-
+    public void addMissingEans() {
+        IHurtXMLPZPosition tmp;
+        for (XMLPZPosition item : PZItemsList){
+            if(!((IHurtXMLPZPosition)item).getIsAlreadyInOptima()){
+                tmp = ((IHurtXMLPZPosition)item);
+                addNewEan(tmp.getEAN(),tmp.getSymbol(),tmp.getNazwa(),tmp.getStawkaVat(),tmp.getjEW());
+            }
+        }
     }
+
+
 
     //Getters and setters section
 

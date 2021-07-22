@@ -30,6 +30,6 @@ public interface XMLInterface {
     /**
      * Additional method responsible for sending communication to userUI
      */
-    void notification();
+    void addMissingEans();
 
 }

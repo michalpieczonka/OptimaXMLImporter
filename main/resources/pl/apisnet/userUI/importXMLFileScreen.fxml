@@ -23,7 +23,7 @@
             <TableColumn prefWidth="75.0" text="C1" />
         </columns>
       </TableView>
-      <ImageView fitHeight="109.0" fitWidth="200.0" layoutX="412.0" layoutY="628.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="109.0" fitWidth="200.0" layoutX="412.0" layoutY="647.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@logoIMG/logo1.png" />
          </image>
@@ -33,10 +33,6 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </JFXButton>
-      <Label fx:id="tableDesc" layoutX="551.0" layoutY="63.0" prefHeight="17.0" prefWidth="143.0" text="Wczytane dane">
-         <font>
-            <Font size="14.0" />
-         </font></Label>
       <Label layoutX="57.0" layoutY="87.0" prefHeight="21.0" prefWidth="160.0" text="Zalogowano do firmy:">
          <font>
             <Font name="System Bold" size="15.0" />
@@ -86,8 +82,34 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </JFXButton>
-      <Label layoutX="585.0" layoutY="526.0" text="Postęp" />
-      <JFXButton fx:id="processImportButton" buttonType="RAISED" layoutX="55.0" layoutY="487.0" onAction="#startImporting" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER" AnchorPane.leftAnchor="55.0">
+      <JFXButton fx:id="processImportButton" buttonType="RAISED" layoutX="55.0" layoutY="475.0" onAction="#startImporting" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER" AnchorPane.leftAnchor="55.0">
+         <effect>
+            <DropShadow />
+         </effect>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <Label fx:id="tableDesc" layoutX="575.0" layoutY="74.0" text="Wczytane dane">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+         <effect>
+            <Lighting>
+               <bumpInput>
+                  <Shadow />
+               </bumpInput>
+               <light>
+                  <Light.Distant>
+                     <color>
+                        <Color red="0.3803921639919281" green="0.6313725709915161" blue="0.7803921699523926" />
+                     </color>
+                  </Light.Distant>
+               </light>
+            </Lighting>
+         </effect>
+      </Label>
+      <JFXButton fx:id="processButton" buttonType="RAISED" layoutX="245.0" layoutY="475.0" onAction="#processFileToOptima" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
          <effect>
             <DropShadow />
          </effect>
