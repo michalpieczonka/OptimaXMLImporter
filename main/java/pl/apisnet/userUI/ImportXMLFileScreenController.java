@@ -4,15 +4,20 @@ import com.jfoenix.controls.JFXButton;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import pl.apisnet.backEND.AddPZDocumentService;
+import pl.apisnet.backEND.ImportItemsToOptimaService;
+import pl.apisnet.backEND.ImportXmlService;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLIHurtParser;
-import pl.apisnet.backEND.XMLFiles.XMLInterface;
+import pl.apisnet.backEND.XMLFiles.XMLImporter;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
@@ -30,18 +35,29 @@ public class ImportXMLFileScreenController implements Initializable {
     FileChooser fileChooser; //Global object for choosing File
     String fileToImportPath; //Path to selected file by User
 
-    XMLInterface importer;
+    XMLImporter importer; //Abstract object for different importer types
+    int missingEansCounter;
+
+    boolean[] selectedFileType = new boolean[]{false,false,false}; // Array for storing logic for selected type of file
+                                                 // 1 - iHurt | 2 - Subiekt | 3 - Excel
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mainOptima = optimaHolderInstance.getMainOptima();
         optimaFirmName.setText(mainOptima.getOptimaCompanyName());
         processImportButton.setVisible(false);
-        processButton.setVisible(false);
+        addMissingEansButton.setVisible(false);
         itemsTable.getColumns().clear();
+        progressIn.setVisible(false);
+        progressIn.setStyle(" -fx-progress-color: #d85c2c");
+        loadLabel.setVisible(false);
+        addPZDocumentButton.setVisible(false);
+        addPZDocumentButton.setText("Utwórz dokument PZ");
     }
 
 
+    @FXML
+    private Label loadLabel;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -53,7 +69,7 @@ public class ImportXMLFileScreenController implements Initializable {
     private JFXButton exitButton;
 
     @FXML
-    private JFXButton processButton;
+    private JFXButton addMissingEansButton;
 
     @FXML
     private Label tableDesc;
@@ -73,7 +89,14 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private JFXButton processImportButton;
 
-//Exiting from app
+    @FXML
+    private ProgressIndicator progressIn;
+
+    @FXML
+    private JFXButton addPZDocumentButton;
+
+
+    //Exiting from app
     @FXML
     void exit(ActionEvent event) {
 
@@ -93,7 +116,6 @@ public class ImportXMLFileScreenController implements Initializable {
         if(!fileToImportPath.isBlank()){
             processImportButton.setVisible(true);
             importer = new XMLIHurtParser(fileToImportPath, mainOptima);
-
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XML !");
             alert.setHeaderText("  Brak pliku !");
@@ -117,8 +139,62 @@ public class ImportXMLFileScreenController implements Initializable {
 
 //ActionListener for importing readed data (into Lists) to Optima
     @FXML
-    void processFileToOptima(ActionEvent event) {
+    void addMissingEansToOptima(ActionEvent event) {
+        addMissingEansButton.setDisable(true);
+        //Using task to do not freez main JavaFX GUI thread
+        loadLabel.setVisible(true);
+        loadLabel.setText("Dodawanie brakujących pozycji");
+        final ImportItemsToOptimaService imp = new ImportItemsToOptimaService(importer);
+        progressIn.visibleProperty().bind(imp.runningProperty());
+        addPZDocumentButton.setVisible(true);
+        //If items were added successfully to Optima
+        imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent workerStateEvent) {
+                loadLabel.setVisible(false);
+                insertDataIntoTable(importer.getPZItemsList());
+                System.out.println("towar dodany");
+            }
+        });
 
+        //If items were not added successfully to optima
+        imp.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent workerStateEvent) {
+                addPZDocumentButton.setDisable(true);
+                loadLabel.setVisible(false);
+                System.out.println("nie udalo sie dodac towaru");
+            }
+        });
+        imp.restart();
+    }
+
+
+    @FXML
+    void createPZDocument(ActionEvent event) {
+        final AddPZDocumentService imp = new AddPZDocumentService(importer);
+        progressIn.visibleProperty().bind(imp.runningProperty());
+        loadLabel.setVisible(true);
+        loadLabel.setText("Tworzenie dokumentu PZ");
+        addMissingEansButton.setDisable(true);
+        //If PZ document was successfully created
+        imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent workerStateEvent) {
+                loadLabel.setVisible(false);
+                System.out.println("superancko zaimportowane");
+            }
+        });
+
+        //If PZ document was not successfully created
+        imp.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent workerStateEvent) {
+                loadLabel.setVisible(false);
+                System.out.println("Zjebalo sie i nic nie dziala");
+            }
+        });
+        imp.restart();
     }
 
 
@@ -137,15 +213,65 @@ public class ImportXMLFileScreenController implements Initializable {
         }
     }
 
-
+    /**
+     * Method responsible for processing import given XML file into Optima
+     */
     private void processImport(){
         if (mainOptima.checkOptimaConnection()){
-            XMLIHurtParser iHurtImporter = new XMLIHurtParser(fileToImportPath, mainOptima);
             try{
-                iHurtImporter.readXmlFileHeaders();
-                insertDataIntoTable(iHurtImporter.getPZItemsList());
+                loadLabel.setVisible(true);
+                loadLabel.setText("Przetwarzanie wczytanego pliku");
+                ImportXmlService impXmlService = new ImportXmlService(importer);
+                progressIn.visibleProperty().bind(impXmlService.runningProperty());
+                //If file was read successfully
+                impXmlService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                    @Override
+                    public void handle(WorkerStateEvent workerStateEvent) {
+                        //Disabling all other buttons to avoid creating PZ with missing EANS(Items)
+                        processImportButton.setDisable(true);
+                        subiektButton.setDisable(true);
+                        iHurtButton.setDisable(true);
+                        excelButton.setDisable(true);
+                        loadLabel.setVisible(false);
+
+                        //Inserting data into Table
+                        insertDataIntoTable(importer.getPZItemsList());
+                        //Checking if missing Items exists and showing appropriate notifications
+                        checkIfItemListCointainsMissingEans();
+                        addMissingEansButton.setVisible(true);
+                        addMissingEansButton.setText("Dodaj brakujące towary\ndo Optima ");
+                        if(missingEansCounter > 0){
+                            Alert alert = new Alert(Alert.AlertType.ERROR,"  Znaleziono "+missingEansCounter+" brakujących towarów!\n  Brakujące towary zostaną dodane po uruchomieniu procedury!");
+                            alert.setHeaderText("  Uwaga !");
+                            alert.setTitle("Brakujace towary");
+                            alert.show();
+                        }else{
+                            addMissingEansButton.setDisable(true);
+                            addPZDocumentButton.setVisible(true);
+                            Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie znaleziono brakujących towarów. ");
+                            alert.setHeaderText("  Uwaga !");
+                            alert.setTitle("Brakujace towary");
+                            alert.show();
+                        }
+
+
+                    }
+                });
+
+                //If file was read unsuccessfully
+                impXmlService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+                    @Override
+                    public void handle(WorkerStateEvent workerStateEvent) {
+                        loadLabel.setVisible(false);
+                        System.out.println("Zjebalo sie i nic nie dziala");
+                    }
+                });
+                impXmlService.restart();
+
+
 
             } catch (Exception e){
+                System.out.println(e);
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik XML posiada niepoprawną składnie !");
                 alert.setHeaderText("  Błąd krytyczny !");
                 alert.show();
@@ -160,8 +286,10 @@ public class ImportXMLFileScreenController implements Initializable {
     }
 
 
-
-    void insertDataIntoTable(List<XMLPZPosition> itemsInXML){
+    /**
+     * Method responsible for writing data into Table, read from xml file
+     */
+    private void insertDataIntoTable(List<XMLPZPosition> itemsInXML){
         itemsTable.getColumns().clear();
 
         ObservableList<XMLPZPosition> itemsInTable = FXCollections.observableArrayList(itemsInXML);
@@ -191,6 +319,18 @@ public class ImportXMLFileScreenController implements Initializable {
                     setStyle("-fx-background-color: #CD5C5C;");
             }
         });
+    }
+
+    /**
+     * Method responsible for checking if in list exists any item that is not already in Optima
+     */
+    private void checkIfItemListCointainsMissingEans(){
+        missingEansCounter = 0;
+        for (int i=0; i<importer.getPZItemsList().size(); i++){
+            if (!importer.getPZItemsList().get(i).isAlreadyInOptima()){
+                missingEansCounter ++;
+            }
+        }
     }
 
 

@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
@@ -109,7 +110,21 @@
             </Lighting>
          </effect>
       </Label>
-      <JFXButton fx:id="processButton" buttonType="RAISED" layoutX="245.0" layoutY="475.0" onAction="#processFileToOptima" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
+      <JFXButton fx:id="addMissingEansButton" buttonType="RAISED" layoutX="245.0" layoutY="475.0" onAction="#addMissingEansToOptima" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
+         <effect>
+            <DropShadow />
+         </effect>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </JFXButton>
+      <ProgressIndicator fx:id="progressIn" layoutX="727.0" layoutY="501.0" prefHeight="68.0" prefWidth="64.0" />
+      <Label fx:id="loadLabel" layoutX="654.0" layoutY="465.0" prefHeight="29.0" prefWidth="288.0" text="Ładowanie">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="addPZDocumentButton" buttonType="RAISED" layoutX="432.0" layoutY="475.0" onAction="#createPZDocument" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
          <effect>
             <DropShadow />
          </effect>

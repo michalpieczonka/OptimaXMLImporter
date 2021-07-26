@@ -7,10 +7,8 @@ package pl.apisnet.backEND.XMLFiles;
 import com.jacob.com.Dispatch;
 import com.jacob.com.SafeArray;
 import com.jacob.com.Variant;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
@@ -23,20 +21,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XMLIHurtParser implements XMLInterface {
+public class XMLIHurtParser extends XMLImporter {
 
-    private final String optimaFindEanClassName = "findEan"; //Name of finding EAN function in DLL library created in C# using Optima API
-    private final String optimaAddNewItemClassName = "addItemByEan"; //Name of adding new Item function in DLL library crated in c# using Optima API
-    private final String optimaAddNewPzClassName = "addPZDocument"; //Name of adding new PZ function in DLL library created in c# using Optima API
+ //  private final String optimaFindEanClassName = "findEan"; //Name of finding EAN function in DLL library created in C# using Optima API
+ //  private final String optimaAddNewItemClassName = "addItemByEan"; //Name of adding new Item function in DLL library crated in c# using Optima API
+ //  private final String optimaAddNewPzClassName = "addPZDocument"; //Name of adding new PZ function in DLL library created in c# using Optima API
 
-    private String xmlFilePath;  //Path to XMLFILE to be parsed
-    private DocumentBuilderFactory factory;
-    private Document xmlFile;
-    private NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
-    private Optima mainOptima;
+ //  private String xmlFilePath;  //Path to XMLFILE to be parsed
+ //  private DocumentBuilderFactory factory;
+ //  private Document xmlFile;
+ //  private NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
+ //  private Optima mainOptima;
 
-    //private List<IHurtXMLPZPosition> PZItemsList;
-    private List<XMLPZPosition> PZItemsList;
+ //  //private List<IHurtXMLPZPosition> PZItemsList;
+ //  private List<XMLPZPosition> PZItemsList;
 
     /**
      * Parameters (Path_To_xml_file, global instance of Optima class Object)
@@ -130,11 +128,10 @@ public class XMLIHurtParser implements XMLInterface {
 
     @Override
     public void addMissingEans() {
-        IHurtXMLPZPosition tmp;
         for (XMLPZPosition item : PZItemsList){
-            if(!((IHurtXMLPZPosition)item).getIsAlreadyInOptima()){
-                tmp = ((IHurtXMLPZPosition)item);
-                addNewEan(tmp.getEAN(),tmp.getSymbol(),tmp.getNazwa(),tmp.getStawkaVat(),tmp.getjEW());
+            if(!item.isAlreadyInOptima()){
+                addNewEan(item.getEAN(),item.getSymbol(),item.getNazwa(),item.getStawkaVat(),item.getjEW());
+                item.setAlreadyInOptima(true);
             }
         }
     }
@@ -148,10 +145,10 @@ public class XMLIHurtParser implements XMLInterface {
         return mainOptima;
     }
 
-    public List<XMLPZPosition> getPZItemsList() {
-        return PZItemsList;
-    }
-
+  //  public List<XMLPZPosition> getPZItemsList() {
+  //      return PZItemsList;
+  //  }
+//
     String getOptimaFindEanClassName() {
         return optimaFindEanClassName;
     }
