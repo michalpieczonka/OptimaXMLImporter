@@ -8,10 +8,15 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import pl.apisnet.backEND.AddPZDocumentService;
 import pl.apisnet.backEND.ImportItemsToOptimaService;
 import pl.apisnet.backEND.ImportXmlService;
@@ -23,7 +28,9 @@ import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ImportXMLFileScreenController implements Initializable {
@@ -37,6 +44,7 @@ public class ImportXMLFileScreenController implements Initializable {
 
     XMLImporter importer; //Abstract object for different importer types
     int missingEansCounter;
+    List<String> correctJEWList = Arrays.asList("szt","godz","kg","litr","m","mkw","opak");
 
     boolean[] selectedFileType = new boolean[]{false,false,false}; // Array for storing logic for selected type of file
                                                  // 1 - iHurt | 2 - Subiekt | 3 - Excel
@@ -141,19 +149,36 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     void addMissingEansToOptima(ActionEvent event) {
         addMissingEansButton.setDisable(true);
+        for (XMLPZPosition item: importer.getPZItemsList()){
+            if (!item.isIsjEWCorrect()){
+                ChoiceDialog<String> dialog = new ChoiceDialog<>("szt", correctJEWList);
+                dialog.setTitle("Wymagane działanie");
+                dialog.setHeaderText("Towar "+item.getSymbol()+" posiada niepoprawnie zdefiniowaną jednostkę miary !\n"+item.getjEW()+" jest niepoprawna !");
+                dialog.setContentText("Aby usunąć problem dostosuj jednostkę miary:");
+
+                Optional<String> result = dialog.showAndWait();
+                if (result.isPresent()){
+                    item.setjEW(result.get());
+                    item.setIsjEWCorrect(true);
+                } else if (result.isEmpty()){
+                    System.out.println("wybrano anuluj");
+                }
+            }
+        }
         //Using task to do not freez main JavaFX GUI thread
         loadLabel.setVisible(true);
         loadLabel.setText("Dodawanie brakujących pozycji");
         final ImportItemsToOptimaService imp = new ImportItemsToOptimaService(importer);
         progressIn.visibleProperty().bind(imp.runningProperty());
         addPZDocumentButton.setVisible(true);
+        addPZDocumentButton.setDisable(true);
         //If items were added successfully to Optima
         imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
                 insertDataIntoTable(importer.getPZItemsList());
-                System.out.println("towar dodany");
+                addPZDocumentButton.setDisable(false);
             }
         });
 
@@ -167,6 +192,7 @@ public class ImportXMLFileScreenController implements Initializable {
             }
         });
         imp.restart();
+
     }
 
 
@@ -297,14 +323,16 @@ public class ImportXMLFileScreenController implements Initializable {
         TableColumn<XMLPZPosition,String> eanColumn = new TableColumn<>("EAN");
         TableColumn<XMLPZPosition,String> symbolColumn = new TableColumn<>("Symbol");
         TableColumn<XMLPZPosition,String> nazwaColumn = new TableColumn<>("Nazwa towaru");
+        TableColumn<XMLPZPosition,String> jEWColumn = new TableColumn<>("Jednostka miary");
         TableColumn<XMLPZPosition,String> cenaColumn = new TableColumn<>("Cena");
         TableColumn<XMLPZPosition,String> iloscColumn = new TableColumn<>("Ilość");
 
-        itemsTable.getColumns().addAll(symbolColumn,nazwaColumn,eanColumn,cenaColumn,iloscColumn);
+        itemsTable.getColumns().addAll(symbolColumn,nazwaColumn,eanColumn,jEWColumn,cenaColumn,iloscColumn);
 
         eanColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getEAN()));
         symbolColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getSymbol()));
         nazwaColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getNazwa()));
+        jEWColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getjEW()));
         cenaColumn.setCellValueFactory(data -> new SimpleStringProperty(Double.toString(((IHurtXMLPZPosition) data.getValue()).getCena())));
         iloscColumn.setCellValueFactory(data -> new SimpleStringProperty(Integer.toString(((IHurtXMLPZPosition) data.getValue()).getIlosc())));
         itemsTable.setItems(itemsInTable);

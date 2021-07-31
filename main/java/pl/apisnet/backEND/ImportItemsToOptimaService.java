@@ -15,7 +15,6 @@ public class ImportItemsToOptimaService extends Service<String> {
             @Override
             protected String call() throws Exception {
                 importer.addMissingEans();
-               // importer.addNewPZ();
                 String res = "toto";
                 Thread.sleep(1000);
                 return res;

@@ -9,6 +9,7 @@ public abstract class XMLPZPosition {
     protected String jEW;
     protected String EAN;
     protected boolean isAlreadyInOptima;
+    protected boolean isjEWCorrect;
 
 
     public boolean isAlreadyInOptima(){
@@ -36,5 +37,17 @@ public abstract class XMLPZPosition {
     }
     public void setAlreadyInOptima(boolean alreadyInOptima) {
         isAlreadyInOptima = alreadyInOptima;
+    }
+
+    public boolean isIsjEWCorrect() {
+        return isjEWCorrect;
+    }
+
+    public void setIsjEWCorrect(boolean isjEWCorrect) {
+        this.isjEWCorrect = isjEWCorrect;
+    }
+
+    public void setjEW(String jEW) {
+        this.jEW = jEW;
     }
 }

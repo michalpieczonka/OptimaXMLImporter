@@ -7,6 +7,7 @@ import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,8 @@ public abstract class XMLImporter {
     protected Optima mainOptima;
 
     //private List<IHurtXMLPZPosition> PZItemsList;
-    protected List<XMLPZPosition> PZItemsList;
+    protected List<XMLPZPosition> PZItemsList; //List of items readed from file, imported by User
+    protected List<String> UnitsOfMeasure = Arrays.asList("szt","Szt","godz","Godz","kg","Kg","litr","Litr","m","M","mkw","Mkw","opak","Opak"); //List of units of measure available in Optima
     /**
      * Method responsible for reading XML-file, parsing it, and calling checkIfEanNumberExists()
      */
@@ -53,6 +55,10 @@ public abstract class XMLImporter {
 
     public List<XMLPZPosition> getPZItemsList() {
         return PZItemsList;
+    }
+
+    public List<String> getUnitsOfMeasure(){
+        return UnitsOfMeasure;
     }
 
 }

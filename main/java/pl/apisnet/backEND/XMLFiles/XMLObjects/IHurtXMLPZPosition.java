@@ -6,7 +6,7 @@ public class IHurtXMLPZPosition extends XMLPZPosition {
   // private double cena;
   // private String EAN;
 
-    public IHurtXMLPZPosition(String symbol, int ilosc, double cena, String EAN, String nazwa,String jEW, int stawkaVat, boolean isAlreadyInOptima) {
+    public IHurtXMLPZPosition(String symbol, int ilosc, double cena, String EAN, String nazwa,String jEW, int stawkaVat, boolean isAlreadyInOptima, boolean isjEWCorrect) {
         this.symbol = symbol;
         this.ilosc = ilosc;
         this.cena = cena;
@@ -15,6 +15,7 @@ public class IHurtXMLPZPosition extends XMLPZPosition {
         this.EAN = EAN;
         this.nazwa = nazwa;
         this.isAlreadyInOptima = isAlreadyInOptima;
+        this.isjEWCorrect = isjEWCorrect;
     }
 
     public int getStawkaVat(){return stawkaVat;}
@@ -36,7 +37,16 @@ public class IHurtXMLPZPosition extends XMLPZPosition {
         return EAN;
     }
 
+
     public boolean getIsAlreadyInOptima(){
         return isAlreadyInOptima;
+    }
+
+    public boolean isIsjEWCorrect() {
+        return isjEWCorrect;
+    }
+
+    public void setIsjEWCorrect(boolean isjEWCorrect) {
+        this.isjEWCorrect = isjEWCorrect;
     }
 }
