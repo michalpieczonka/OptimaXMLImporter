@@ -16,6 +16,14 @@ public abstract class XMLPZPosition {
         return isAlreadyInOptima;
     }
 
+    public int getIlosc() {
+        return ilosc;
+    }
+
+    public double getCena() {
+        return cena;
+    }
+
     public String getSymbol() {
         return symbol;
     }

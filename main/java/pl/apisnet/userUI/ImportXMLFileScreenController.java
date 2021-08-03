@@ -354,19 +354,19 @@ public class ImportXMLFileScreenController implements Initializable {
 
         itemsTable.getColumns().addAll(symbolColumn,nazwaColumn,eanColumn,jEWColumn,cenaColumn,iloscColumn);
 
-        eanColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getEAN()));
-        symbolColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getSymbol()));
-        nazwaColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getNazwa()));
-        jEWColumn.setCellValueFactory(data -> new SimpleStringProperty(((IHurtXMLPZPosition) data.getValue()).getjEW()));
-        cenaColumn.setCellValueFactory(data -> new SimpleStringProperty(Double.toString(((IHurtXMLPZPosition) data.getValue()).getCena())));
-        iloscColumn.setCellValueFactory(data -> new SimpleStringProperty(Integer.toString(((IHurtXMLPZPosition) data.getValue()).getIlosc())));
+        eanColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getEAN()));
+        symbolColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getSymbol()));
+        nazwaColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getNazwa()));
+        jEWColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getjEW()));
+        cenaColumn.setCellValueFactory(data -> new SimpleStringProperty(Double.toString(((XMLPZPosition) data.getValue()).getCena())));
+        iloscColumn.setCellValueFactory(data -> new SimpleStringProperty(Integer.toString(((XMLPZPosition) data.getValue()).getIlosc())));
         itemsTable.setItems(itemsInTable);
 
         itemsTable.setRowFactory(tv -> new TableRow<XMLPZPosition>() {
             @Override
             protected void updateItem(XMLPZPosition item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || ((IHurtXMLPZPosition)(item)).getIsAlreadyInOptima())
+                if (item == null || (item).isAlreadyInOptima())
                     setStyle("-fx-background-color: #baffba;");
                 else
                     setStyle("-fx-background-color: #CD5C5C;");

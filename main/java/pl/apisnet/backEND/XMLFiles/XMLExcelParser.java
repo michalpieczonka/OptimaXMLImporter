@@ -82,9 +82,8 @@ public class XMLExcelParser extends XMLImporter{
 
                 //Reading values from excel
                 int rows = excelSheet.getLastRowNum();
-                int cols = 7;
 
-                for(int r=1; r<rows; r++){
+                for(int r=1; r<=rows; r++){
                     XSSFRow row = excelSheet.getRow(r);
 
                     //Nazwa towaru
@@ -100,9 +99,6 @@ public class XMLExcelParser extends XMLImporter{
                         cell.setCellType(CellType.STRING);
                     PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),false,false));
                 }
-
-                for(int i=0; i<PZItemsList.size(); i++)
-                    System.out.println(PZItemsList.get(i).getSymbol());
 
             }
             else {
