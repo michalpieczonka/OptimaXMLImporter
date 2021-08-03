@@ -21,6 +21,7 @@ import pl.apisnet.backEND.AddPZDocumentService;
 import pl.apisnet.backEND.ImportItemsToOptimaService;
 import pl.apisnet.backEND.ImportXmlService;
 import pl.apisnet.backEND.Optima;
+import pl.apisnet.backEND.XMLFiles.XMLExcelParser;
 import pl.apisnet.backEND.XMLFiles.XMLIHurtParser;
 import pl.apisnet.backEND.XMLFiles.XMLImporter;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
@@ -115,6 +116,29 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     void importExcel(ActionEvent event) {
         selectXmlFile();
+        if (!fileToImportPath.isBlank()){
+            importer = new XMLExcelParser(fileToImportPath,mainOptima);
+            List<String> avliableSheets = ((XMLExcelParser)importer).getAvailableSheets();
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(avliableSheets.get(0), avliableSheets);
+            dialog.setTitle("Wymagane działanie");
+            dialog.setHeaderText("Wybierz arkusz, z którego chcesz zaimportować dane !");
+
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()){
+                ((XMLExcelParser) importer).setSheetName(result.get());
+                processImportButton.setVisible(true);
+            } else if (result.isEmpty()){
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego arkusza !");
+                alert.setHeaderText("  Brak pliku !");
+                alert.show();
+            }
+
+        }else{
+            Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku xlsx !");
+            alert.setHeaderText("  Brak pliku !");
+            alert.show();
+        }
     }
 
 //Import from iHurt
@@ -161,7 +185,8 @@ public class ImportXMLFileScreenController implements Initializable {
                     item.setjEW(result.get());
                     item.setIsjEWCorrect(true);
                 } else if (result.isEmpty()){
-                    System.out.println("wybrano anuluj");
+                    System.out.println("Usunięto pozycje");
+                    importer.getPZItemsList().remove(item);
                 }
             }
         }
