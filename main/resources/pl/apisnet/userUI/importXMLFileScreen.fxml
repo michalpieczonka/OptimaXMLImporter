@@ -17,12 +17,15 @@
 
 <AnchorPane fx:id="mainAnchorPane" prefHeight="768.0" prefWidth="1024.0" style="-fx-background-image: url(pl/apisnet/userUI/readXMLbg.png);" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.apisnet.userUI.ImportXMLFileScreenController">
    <children>
-      <TableView fx:id="itemsTable" layoutX="245.0" layoutY="97.0" prefHeight="347.0" prefWidth="754.0" AnchorPane.rightAnchor="25.0">
+      <TableView fx:id="itemsTable" layoutX="245.0" layoutY="97.0" prefHeight="347.0" prefWidth="754.0" style="-fx-background-radius: 5px;" AnchorPane.rightAnchor="25.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
             <TableColumn prefWidth="75.0" text="C1" />
         </columns>
+         <effect>
+            <DropShadow />
+         </effect>
       </TableView>
       <ImageView fitHeight="109.0" fitWidth="200.0" layoutX="412.0" layoutY="647.0" pickOnBounds="true" preserveRatio="true">
          <image>

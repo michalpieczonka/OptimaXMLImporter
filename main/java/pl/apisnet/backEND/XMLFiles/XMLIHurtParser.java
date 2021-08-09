@@ -28,18 +28,6 @@ import java.util.List;
 
 public class XMLIHurtParser extends XMLImporter {
 
- //  private final String optimaFindEanClassName = "findEan"; //Name of finding EAN function in DLL library created in C# using Optima API
- //  private final String optimaAddNewItemClassName = "addItemByEan"; //Name of adding new Item function in DLL library crated in c# using Optima API
- //  private final String optimaAddNewPzClassName = "addPZDocument"; //Name of adding new PZ function in DLL library created in c# using Optima API
-
- //  private String xmlFilePath;  //Path to XMLFILE to be parsed
- //  private DocumentBuilderFactory factory;
- //  private Document xmlFile;
- //  private NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
- //  private Optima mainOptima;
-
- //  //private List<IHurtXMLPZPosition> PZItemsList;
- //  private List<XMLPZPosition> PZItemsList;
 
     /**
      * Parameters (Path_To_xml_file, global instance of Optima class Object)
@@ -99,27 +87,6 @@ public class XMLIHurtParser extends XMLImporter {
 
 
     /**
-     * Returns if Optima already contains Ean with given argument
-     * Invoking method @optimaFindEanClassName from OptimaLIBB.dll
-     * Parameters - Ean number to check
-     */
-    @Override
-    public boolean checkIfEanNumbersExists(String eanNumberToCheck) {
-            return Dispatch.call(mainOptima.getOptimaProgramID(),optimaFindEanClassName,eanNumberToCheck).getBoolean();
-    }
-
-    /**
-     * Adding new Item to Optima
-     * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
-     * Parameters - necessary components of the item (ean,symbol,name,VatRate,unitOfMeasure)
-     */
-    @Override
-    public void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure) {
-        Dispatch.call(mainOptima.getOptimaProgramID(),optimaAddNewItemClassName,eanNumber,symbol,itemName,vatRate,unitOfMeasure);
-    }
-
-
-    /**
      * Adding new PZ to Optima
      * Invoking method @optimaAddNewPzClassName from OptimaLIBB.dll
      * Parameters - list of items in XML file
@@ -139,19 +106,6 @@ public class XMLIHurtParser extends XMLImporter {
         Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray);
     }
 
-    /**
-     * Adding missing EANS to Optima
-     * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
-     */
-    @Override
-    public void addMissingEans() {
-        for (XMLPZPosition item : PZItemsList){
-            if(!item.isAlreadyInOptima()){
-                    addNewEan(item.getEAN(),item.getSymbol(),item.getNazwa(),item.getStawkaVat(),item.getjEW()); //Adding new Item into Optima
-                    item.setAlreadyInOptima(true); //Changing item status (Already in Optima = True)
-            }
-        }
-    }
 
 
 

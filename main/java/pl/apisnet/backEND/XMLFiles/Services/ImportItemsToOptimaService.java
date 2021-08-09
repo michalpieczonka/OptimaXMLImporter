@@ -1,22 +1,20 @@
-package pl.apisnet.backEND;
+package pl.apisnet.backEND.XMLFiles.Services;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import pl.apisnet.backEND.XMLFiles.XMLImporter;
 
-public class ImportXmlService  extends Service<String> {
-
+public class ImportItemsToOptimaService extends Service<String> {
     private XMLImporter importer;
-    public ImportXmlService(XMLImporter importer){
+    public ImportItemsToOptimaService(XMLImporter importer){
         this.importer = importer;
     }
-
     @Override
     protected Task<String> createTask() {
         return new Task<String>() {
             @Override
             protected String call() throws Exception {
-                importer.readXmlFileHeaders();
+                importer.addMissingEans();
                 String res = "toto";
                 Thread.sleep(1000);
                 return res;

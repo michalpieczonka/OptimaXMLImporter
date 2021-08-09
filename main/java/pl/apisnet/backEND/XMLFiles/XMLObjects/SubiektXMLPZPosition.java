@@ -2,11 +2,13 @@ package pl.apisnet.backEND.XMLFiles.XMLObjects;
 
 import java.math.BigDecimal;
 
-public class ExcelXMLPZPosition extends XMLPZPosition {
-    public ExcelXMLPZPosition(String symbol, int ilosc, double cena, String EAN, String nazwa, String jEW, int stawkaVat, boolean isAlreadyInOptima, boolean isjEWCorrect) {
+public class SubiektXMLPZPosition extends XMLPZPosition{
+
+    BigDecimal cena2;
+    public SubiektXMLPZPosition(String symbol, int ilosc, BigDecimal cena, String EAN, String nazwa, String jEW, int stawkaVat, boolean isAlreadyInOptima, boolean isjEWCorrect) {
         this.symbol = symbol;
         this.ilosc = ilosc;
-        this.cena = cena;
+        this.cena2 = cena;
         this.stawkaVat = stawkaVat;
         this.jEW = jEW;
         this.EAN = EAN;
@@ -14,11 +16,6 @@ public class ExcelXMLPZPosition extends XMLPZPosition {
         this.isAlreadyInOptima = isAlreadyInOptima;
         this.isjEWCorrect = isjEWCorrect;
     }
-    public ExcelXMLPZPosition(){
-
-    }
-
-
     public int getStawkaVat(){return stawkaVat;}
     public String getjEW(){return jEW;}
     public String getNazwa(){ return nazwa;}
@@ -31,7 +28,8 @@ public class ExcelXMLPZPosition extends XMLPZPosition {
     }
 
     public double getCena() {
-        return cena;
+        double value=cena2.doubleValue();
+        return value;
     }
 
     public String getEAN() {

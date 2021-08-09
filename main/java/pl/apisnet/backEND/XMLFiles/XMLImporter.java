@@ -1,6 +1,7 @@
 package pl.apisnet.backEND.XMLFiles;
 
 
+import com.jacob.com.Dispatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import pl.apisnet.backEND.Optima;
@@ -35,23 +36,44 @@ public abstract class XMLImporter {
 
     /**
      * Method responsible for checking if parsed EAN numbers are already in OPTIMA databse, using DLL (OptimaLIBB)
+     * Returns if Optima already contains Ean with given argument
+     * Invoking method @optimaFindEanClassName from OptimaLIBB.dll
+     * Parameters - Ean number to check
      */
-    public abstract boolean checkIfEanNumbersExists(String eanNumber);
+    public boolean checkIfEanNumbersExists(String eanNumber){
+        return Dispatch.call(mainOptima.getOptimaProgramID(),optimaFindEanClassName,eanNumber).getBoolean();
+    };
 
     /**
      * Method responsible for adding new Item to Optima database, using DLL (OptimaLIBB)
+     * Adding new Item to Optima
+     * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
+     * Parameters - necessary components of the item (ean,symbol,name,VatRate,unitOfMeasure)
      */
-    public abstract void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure);
+    public void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure){
+        Dispatch.call(mainOptima.getOptimaProgramID(),optimaAddNewItemClassName,eanNumber,symbol,itemName,vatRate,unitOfMeasure);
+    };
+
 
     /**
      * Method responsible for creating new PZ Document in Optima, using DLL (OptimaLIBB)
      */
     public abstract void addNewPZ();
 
+
     /**
      * Method responsible for adding missing items (with missing EAN's numbers) into Optima
+     * Adding missing EANS to Optima
+     * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
      */
-    public abstract void addMissingEans();
+    public void addMissingEans(){
+        for (XMLPZPosition item : PZItemsList){
+            if(!item.isAlreadyInOptima()){
+                addNewEan(item.getEAN(),item.getSymbol(),item.getNazwa(),item.getStawkaVat(),item.getjEW()); //Adding new Item into Optima
+                item.setAlreadyInOptima(true); //Changing item status (Already in Optima = True)
+            }
+        }
+    };
 
     public List<XMLPZPosition> getPZItemsList() {
         return PZItemsList;

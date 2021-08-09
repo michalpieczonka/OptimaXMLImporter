@@ -8,24 +8,19 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import pl.apisnet.backEND.AddPZDocumentService;
-import pl.apisnet.backEND.ImportItemsToOptimaService;
-import pl.apisnet.backEND.ImportXmlService;
+import pl.apisnet.backEND.XMLFiles.Services.AddPZDocumentService;
+import pl.apisnet.backEND.XMLFiles.Services.ImportItemsToOptimaService;
+import pl.apisnet.backEND.XMLFiles.Services.ImportXmlService;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLExcelParser;
 import pl.apisnet.backEND.XMLFiles.XMLIHurtParser;
 import pl.apisnet.backEND.XMLFiles.XMLImporter;
-import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
+import pl.apisnet.backEND.XMLFiles.XMLSubiektParser;
 
 import java.io.File;
 import java.net.URL;
@@ -135,7 +130,7 @@ public class ImportXMLFileScreenController implements Initializable {
             }
 
         }else{
-            Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku xlsx !");
+            Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XLSX!");
             alert.setHeaderText("  Brak pliku !");
             alert.show();
         }
@@ -159,6 +154,14 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     void importSubiekt(ActionEvent event) {
         selectXmlFile();
+        if(!fileToImportPath.isBlank()){
+            processImportButton.setVisible(true);
+            importer = new XMLSubiektParser(fileToImportPath, mainOptima);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku EPP !");
+            alert.setHeaderText("  Brak pliku !");
+            alert.show();
+        }
     }
 
 
@@ -353,6 +356,13 @@ public class ImportXMLFileScreenController implements Initializable {
         TableColumn<XMLPZPosition,String> iloscColumn = new TableColumn<>("Ilość");
 
         itemsTable.getColumns().addAll(symbolColumn,nazwaColumn,eanColumn,jEWColumn,cenaColumn,iloscColumn);
+
+        eanColumn.setPrefWidth(110);
+        symbolColumn.setPrefWidth(150);
+        nazwaColumn.setPrefWidth(200);
+        jEWColumn.setPrefWidth(120);
+        cenaColumn.setPrefWidth(90);
+        iloscColumn.setPrefWidth(83);
 
         eanColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getEAN()));
         symbolColumn.setCellValueFactory(data -> new SimpleStringProperty(((XMLPZPosition) data.getValue()).getSymbol()));

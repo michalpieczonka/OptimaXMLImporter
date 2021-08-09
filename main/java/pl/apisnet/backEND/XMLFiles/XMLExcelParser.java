@@ -1,5 +1,8 @@
 package pl.apisnet.backEND.XMLFiles;
 
+import com.jacob.com.Dispatch;
+import com.jacob.com.SafeArray;
+import com.jacob.com.Variant;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -10,6 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.ExcelXMLPZPosition;
+import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
+import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
 import java.io.FileInputStream;
 import java.util.*;
@@ -86,7 +91,7 @@ public class XMLExcelParser extends XMLImporter{
                 for(int r=1; r<=rows; r++){
                     XSSFRow row = excelSheet.getRow(r);
 
-                    //Nazwa towaru
+                    //Parsing xlsx cell in given row
                     XSSFCell nameCell = row.getCell(elementsOrder[0]);
                     XSSFCell symbolCell = row.getCell(elementsOrder[1]);
                     XSSFCell eanCell = row.getCell(elementsOrder[2]);
@@ -94,10 +99,29 @@ public class XMLExcelParser extends XMLImporter{
                     XSSFCell vatCell = row.getCell(elementsOrder[4]);
                     XSSFCell iloscCell = row.getCell(elementsOrder[5]);
                     XSSFCell cenaCell = row.getCell(elementsOrder[6]);
+
+                    //Setting all cell values to String to simplify next operations
                     List<XSSFCell> tempCellList = Arrays.asList(nameCell,symbolCell,eanCell,jewCell,vatCell,iloscCell,cenaCell);
                     for (XSSFCell cell : tempCellList)
                         cell.setCellType(CellType.STRING);
-                    PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),false,false));
+
+                    //Checking if given element is already in Optima
+                    if (!checkIfEanNumbersExists(tempCellList.get(2).getStringCellValue().trim())){//If is not in Optima
+                        //Checking unit of measure
+                        if (UnitsOfMeasure.contains(tempCellList.get(3).getStringCellValue().trim())){
+                            PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),false,true));
+                        } else{ //Here it can stack because if jEW is not same as oryginal in Optima then its problem
+                            PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),false,false));
+                        }
+
+                    }
+                    else{
+                        if (UnitsOfMeasure.contains(tempCellList.get(3).getStringCellValue().trim())){
+                            PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),true,true));
+                        } else{ //Here it can stack because if jEW is not same as oryginal in Optima then its problem
+                            PZItemsList.add(new ExcelXMLPZPosition(symbolCell.getStringCellValue(),Integer.parseInt(iloscCell.getStringCellValue()),Double.parseDouble(cenaCell.getStringCellValue()),eanCell.getStringCellValue(),nameCell.getStringCellValue(),jewCell.getStringCellValue(),Integer.parseInt(vatCell.getStringCellValue()),true,false));
+                        }
+                    }
                 }
 
             }
@@ -105,31 +129,26 @@ public class XMLExcelParser extends XMLImporter{
                 throw new FileStructureException();
             }
 
-
         }catch (Exception e){
             System.out.println(e);
         }
     }
 
     @Override
-    public boolean checkIfEanNumbersExists(String eanNumber) {
-        return false;
-    }
-
-    @Override
-    public void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure) {
-
-    }
-
-    @Override
     public void addNewPZ() {
-
+        int listOfItemsSize = PZItemsList.size();
+        ExcelXMLPZPosition[] tab = PZItemsList.toArray(new ExcelXMLPZPosition[0]);
+        SafeArray eansArray = new SafeArray (Variant.VariantString,listOfItemsSize);
+        SafeArray amountArray = new SafeArray (Variant.VariantInt, listOfItemsSize);
+        SafeArray pricesArray = new SafeArray (Variant.VariantDouble, listOfItemsSize);
+        for (int i=0; i < listOfItemsSize; i++){
+            eansArray.setString(i, tab[i].getEAN());
+            amountArray.setInt(i,tab[i].getIlosc());
+            pricesArray.setDouble(i, tab[i].getCena());
+        }
+        Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray);
     }
 
-    @Override
-    public void addMissingEans() {
-
-    }
 
     public void setSheetName(String sheetName){
         this.sheetName = sheetName;
