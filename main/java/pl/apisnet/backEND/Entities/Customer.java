@@ -4,52 +4,67 @@ package pl.apisnet.backEND.Entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "User")
+@Table(name = "Customer")
 public class Customer {
     @Id
-    @Column(name = "Id")
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column(name = "Id_Customer")
     private int Id;
 
-    @Column(name = "Login")
-    private String Login;
+    @Column(name = "CustomerLogin")
+    private String CustomerLogin;
 
-    @Column(name = "Password")
-    private String Password;
+    @Column(name = "CustomerPassword")
+    private String CustomerPassword;
 
-    @Column(name = "NIP")
-    private int NIP;
+    @Column(name = "CustomerNIP")
+    private int CustomerNIP;
 
+    @OneToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "Id_CustomerOptimaDetails")
+    private CustomerOptimaDetails customerOptimaDetails;
+
+    public Customer(){
+
+    }
+
+    public Customer(String customerLogin, String customerPassword, int customerNIP) {
+        this.CustomerLogin = customerLogin;
+        this.CustomerPassword = customerPassword;
+        this.CustomerNIP = customerNIP;
+    }
 
     //Getters and setters
-    public int getId() {
-        return Id;
+
+    public String getCustomerLogin() {
+        return CustomerLogin;
     }
 
-    public void setId(int id) {
-        Id = id;
+    public void setCustomerLogin(String customerLogin) {
+        CustomerLogin = customerLogin;
     }
 
-    public String getLogin() {
-        return Login;
+    public String getCustomerPassword() {
+        return CustomerPassword;
     }
 
-    public void setLogin(String login) {
-        Login = login;
+    public void setCustomerPassword(String customerPassword) {
+        CustomerPassword = customerPassword;
     }
 
-    public String getPassword() {
-        return Password;
+    public int getCustomerNIP() {
+        return CustomerNIP;
     }
 
-    public void setPassword(String password) {
-        Password = password;
+    public void setCustomerNIP(int customerNIP) {
+        CustomerNIP = customerNIP;
     }
 
-    public int getNIP() {
-        return NIP;
+    public CustomerOptimaDetails getCustomerOptimaDetails() {
+        return customerOptimaDetails;
     }
 
-    public void setNIP(int NIP) {
-        this.NIP = NIP;
+    public void setCustomerOptimaDetails(CustomerOptimaDetails customerOptimaDetails) {
+        this.customerOptimaDetails = customerOptimaDetails;
     }
 }

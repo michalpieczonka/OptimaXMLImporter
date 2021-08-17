@@ -34,9 +34,7 @@ public class tempMain {
         //SessionFactory factory = new Configuration().configure().buildSessionFactory();
         Session session = factory.getCurrentSession();
         Customer admin = new Customer();
-        admin.setLogin("Admin");
-        admin.setPassword("Limanowa2021");
-        admin.setNIP(123456789);
+
         session.beginTransaction();
         session.save(admin);
         session.getTransaction().commit();

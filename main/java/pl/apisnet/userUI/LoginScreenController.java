@@ -33,6 +33,8 @@ public class LoginScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle rb){
         loadCompanys(); //Loading companys from Optima
 
+        System.out.println(DatabaseHolder.getInstance().getDbConf().getCustomer().getCustomerNIP());
+
         optimaLoginButton.setStyle(IDLE_BUTTON_STYLE);
         optimaLoginButton.setOnMouseEntered(e -> optimaLoginButton.setStyle(HOVERED_BUTTON_STYLE));
         optimaLoginButton.setOnMouseExited(e -> optimaLoginButton.setStyle(IDLE_BUTTON_STYLE));

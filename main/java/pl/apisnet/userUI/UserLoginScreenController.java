@@ -3,7 +3,6 @@ package pl.apisnet.userUI;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -20,9 +19,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import pl.apisnet.backEND.DatabaseConf;
 
 import java.io.IOException;
 import java.net.URL;
@@ -64,7 +62,8 @@ public class UserLoginScreenController implements Initializable {
     private SimpleBooleanProperty showPass;
     private Stage stage;
 
-    boolean isClientOk;
+    DatabaseConf dbCon; //Temporar dBCon object to check if given user input is correct to connect
+    DatabaseHolder dBHolder; //Singletone -> GLOBAL instance of Optima class
 
     private static final String IDLE_BUTTON_STYLE = "-fx-background-color:  #fff; -fx-background-radius: 5px;";
     private static final String HOVERED_BUTTON_STYLE = "-fx-background-color: #f57500; -fx-background-radius: 5px;";
@@ -111,9 +110,10 @@ public class UserLoginScreenController implements Initializable {
     void loginToImporter(ActionEvent event) {
         hidePasswordMethod();
         if (!userPasswordField.getText().isBlank()  && !userLoginField.getText().isBlank()){
-            if(userLoginField.getText().equals("Admin"))
-                isClientOk = true;
-            if (isClientOk){
+            dbCon = new DatabaseConf();
+            if (dbCon.userAuthentication(userLoginField.getText().trim(), userPasswordField.getText().trim())){
+                dBHolder = DatabaseHolder.getInstance();
+                dBHolder.setDbConf(dbCon);
                 try{
                     Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
                     stage.close();
