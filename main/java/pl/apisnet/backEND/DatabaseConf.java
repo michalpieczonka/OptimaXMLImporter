@@ -39,19 +39,37 @@ public class DatabaseConf {
 
         try{
             this.customer = (Customer) query.getSingleResult();
-            System.out.println(customer.getCustomerOptimaDetails().getCompanyName());
             userExists = true;
         }catch (Exception e){
             userExists = false;
         }finally{
             session.close();
-            factory.close();
         }
         return userExists;
     }
 
     public Customer getCustomer() {
         return customer;
+    }
+
+    public boolean updateUserOptimaDetails(String Operator, String operatorPassword, String companyName, String optimaPath){
+        boolean updateResult = false;
+        Session session = factory.getCurrentSession();
+        session.beginTransaction();
+       customer.getCustomerOptimaDetails().setOperator(Operator);
+       customer.getCustomerOptimaDetails().setOperatorPassword(operatorPassword);
+       customer.getCustomerOptimaDetails().setCompanyName(companyName);
+       customer.getCustomerOptimaDetails().setOptimaPath(optimaPath);
+        try{
+            session.save(customer);
+            updateResult = true;
+        } catch (Exception e){
+            System.out.println(e);
+        } finally{
+            session.close();
+            System.out.println(customer.getCustomerOptimaDetails().getCompanyName());
+        }
+        return updateResult;
     }
 
     // private void hibernateLogin(){

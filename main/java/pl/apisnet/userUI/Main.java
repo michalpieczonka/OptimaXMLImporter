@@ -30,7 +30,7 @@ public class Main extends Application {
 
     private void openLoginScreen() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(("mainLoginScreen.fxml")));
-        loginStage.setTitle("AXMLImporter");
+        loginStage.setTitle("AIMPORTER");
         loginStage.setScene(new Scene(root, 450, 460));
         loginStage.setResizable(false);
         loginStage.show();

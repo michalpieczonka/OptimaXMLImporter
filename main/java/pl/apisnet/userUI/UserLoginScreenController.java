@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import pl.apisnet.backEND.DatabaseConf;
 
@@ -117,10 +118,13 @@ public class UserLoginScreenController implements Initializable {
                 try{
                     Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
                     stage.close();
+                    Stage newStage = new Stage();
                     Parent root = FXMLLoader.load(getClass().getResource(("loginScreen.fxml")));
                     Scene scene = new Scene(root);
-                    stage.setScene(scene);
-                    stage.show();
+                    newStage.initStyle(StageStyle.DECORATED);
+                    newStage.setTitle("AIMPORTER");
+                    newStage.setScene(scene);
+                    newStage.show();
                 }catch(IOException e){
                     System.out.println(e);
                     Alert alert = new Alert(Alert.AlertType.ERROR,"  Skontaktuj się z dostawcą oprogramowania !");

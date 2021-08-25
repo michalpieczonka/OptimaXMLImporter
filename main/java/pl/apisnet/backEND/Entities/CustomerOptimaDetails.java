@@ -23,6 +23,7 @@ public class CustomerOptimaDetails {
     @Column(name = "OptimaPath")
     private String OptimaPath;
 
+
     public CustomerOptimaDetails(){
     }
 
