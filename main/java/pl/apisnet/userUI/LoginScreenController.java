@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -38,6 +39,11 @@ public class LoginScreenController implements Initializable {
         loadCompanys(); //Loading companys from Optima
         loadLastUserLoginDetails(); //Loading data from last login
 
+        //Settings labels color for last login data details
+        optimaLastCompany.setTextFill(Color.rgb(245,117,0));
+        usernameLabel.setTextFill(Color.rgb(245,117,0));
+        optimaLastOperator.setTextFill(Color.rgb(245,117,0));
+        optimaLastDir.setTextFill(Color.rgb(245,117,0));
 
         optimaLoginButton.setStyle(IDLE_BUTTON_STYLE);
         optimaLoginButton.setOnMouseEntered(e -> optimaLoginButton.setStyle(HOVERED_BUTTON_STYLE));
@@ -111,13 +117,14 @@ public class LoginScreenController implements Initializable {
      */
     @FXML
     void loginToOptima(ActionEvent event) {
+        mainOptima = null;
         if (optimaInstallationDir.getText() != null && !optimaOperatorField.getText().isBlank() && optimaCompanyName.getSelectionModel().getSelectedItem() !=null ){
             mainOptima = new Optima(optimaOperatorField.getText(),"",optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
 
             if (mainOptima.connectToOptima()){
                 optimaMain = OptimaHolder.getInstance();
                 optimaMain.setMainOptima(mainOptima);
-                DatabaseHolder.getInstance().getDbConf().updateUserOptimaDetails("asd","abc","321asd","C:");
+                DatabaseHolder.getInstance().getDbConf().updateUserOptimaDetails(optimaOperatorField.getText(),optimaOperatorPassField.getText(),optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
                 try{
                     Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
                     stage.close();
@@ -162,6 +169,7 @@ public class LoginScreenController implements Initializable {
     }
     @FXML
     void setLastOptimaSettings(ActionEvent event) {
+        mainOptima = null;
 
     }
 
@@ -169,7 +177,7 @@ public class LoginScreenController implements Initializable {
      * Method responsible for loading all Companys names from Optima, that are necessary for loggin into Optima.
      */
     private void loadCompanys(){
-        optimaCompanyName.getItems().add(0,"Test3");
+        optimaCompanyName.getItems().add(0,"Test12");
     }
 
     /**
@@ -178,20 +186,21 @@ public class LoginScreenController implements Initializable {
     private void loadLastUserLoginDetails(){
         Customer customer = DatabaseHolder.getInstance().getDbConf().getCustomer();
         CustomerOptimaDetails customerOptimaDetails = customer.getCustomerOptimaDetails();
+
         usernameLabel.setText(customer.getCustomerLogin());
 
         if (customerOptimaDetails.getCompanyName().isBlank())
-            optimaLastCompany.setText("Firma: BRAK DANYCH");
+            optimaLastCompany.setText(" BRAK DANYCH");
         else
-            optimaLastCompany.setText("Firma: "+ customerOptimaDetails.getCompanyName());
+            optimaLastCompany.setText(" "+ customerOptimaDetails.getCompanyName());
         if (customerOptimaDetails.getOperator().isBlank())
-            optimaLastOperator.setText("Operator: BRAK DANYCH");
+            optimaLastOperator.setText(" BRAK DANYCH");
         else
-            optimaLastOperator.setText("Operator: "+ customerOptimaDetails.getOperator());
+            optimaLastOperator.setText(" "+ customerOptimaDetails.getOperator());
         if(customerOptimaDetails.getOptimaPath().isBlank())
-            optimaLastDir.setText("Katalog Optima: BRAK DANYCH");
+            optimaLastDir.setText(" BRAK DANYCH");
         else
-            optimaLastDir.setText("Katalog Optima: "+ customerOptimaDetails.getOptimaPath());
+            optimaLastDir.setText(" "+ customerOptimaDetails.getOptimaPath());
 
         //If any of necessary fields are missed, then user can not just login to Optima
         if (customerOptimaDetails.getCompanyName().isBlank() || customerOptimaDetails.getOperator().isBlank() || customerOptimaDetails.getCompanyName().isBlank() ){

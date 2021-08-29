@@ -2,6 +2,7 @@ package pl.apisnet.backEND;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import pl.apisnet.backEND.Entities.Customer;
 import pl.apisnet.backEND.Entities.CustomerOptimaDetails;
@@ -54,45 +55,25 @@ public class DatabaseConf {
 
     public boolean updateUserOptimaDetails(String Operator, String operatorPassword, String companyName, String optimaPath){
         boolean updateResult = false;
-        Session session = factory.getCurrentSession();
-        session.beginTransaction();
-       customer.getCustomerOptimaDetails().setOperator(Operator);
-       customer.getCustomerOptimaDetails().setOperatorPassword(operatorPassword);
-       customer.getCustomerOptimaDetails().setCompanyName(companyName);
-       customer.getCustomerOptimaDetails().setOptimaPath(optimaPath);
+        Session session = null;
         try{
-            session.save(customer);
+            session = factory.getCurrentSession();
+            session.beginTransaction();
+            customer.getCustomerOptimaDetails().setOperator(Operator);
+            customer.getCustomerOptimaDetails().setOperatorPassword(operatorPassword);
+            customer.getCustomerOptimaDetails().setCompanyName(companyName);
+            customer.getCustomerOptimaDetails().setOptimaPath(optimaPath);
+            session.saveOrUpdate(customer.getCustomerOptimaDetails());
+            session.saveOrUpdate(customer);
+            session.getTransaction().commit();
             updateResult = true;
         } catch (Exception e){
             System.out.println(e);
         } finally{
             session.close();
-            System.out.println(customer.getCustomerOptimaDetails().getCompanyName());
+            System.out.println("zrobione");
         }
         return updateResult;
     }
 
-    // private void hibernateLogin(){
- //
-
- //     session.beginTransaction();
- //     Query qu = session.createQuery(qString);
- //     qu.setParameter("password","Limanowwa2021");
- //     qu.setParameter("login","Admin");
- //     //List<Customer> asd = qu.getResultList();
- //     //System.out.println(asd.size());
- //     //String tmp = asd.get(0).getCustomerOptimaDetails().getCompanyName();
- //     //System.out.println(tmp);
- //     try{
- //         List<Customer> asd = qu.getResultList();
- //         System.out.println(asd.size());
- //         String tmp = asd.get(0).getCustomerOptimaDetails().getCompanyName();
- //         System.out.println(tmp);
- //     }catch (Exception e){
- //         System.out.println("mamy nulla");
- //     } finally{
- //         session.close();
- //         factory.close();
- //     }
- // }
 }

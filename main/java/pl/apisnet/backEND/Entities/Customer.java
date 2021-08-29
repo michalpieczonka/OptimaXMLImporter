@@ -20,7 +20,7 @@ public class Customer {
     @Column(name = "CustomerNIP")
     private int CustomerNIP;
 
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "Id_CustomerOptimaDetails")
     private CustomerOptimaDetails customerOptimaDetails;
 

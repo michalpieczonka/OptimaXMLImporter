@@ -73,8 +73,6 @@ public class XMLIHurtParser extends XMLImporter {
                     }
                 }
             }
-            //addNewPZ(PZItemsList);
-
 
         }catch (ParserConfigurationException e){
             e.printStackTrace();
@@ -100,6 +98,7 @@ public class XMLIHurtParser extends XMLImporter {
         SafeArray pricesArray = new SafeArray (Variant.VariantDouble, listOfItemsSize);
         for (int i=0; i < listOfItemsSize; i++){
             eansArray.setString(i, tab[i].getEAN());
+            //eansArray.setString(i, tab[i].getSymbol());
             amountArray.setInt(i,tab[i].getIlosc());
             pricesArray.setDouble(i, tab[i].getCena());
         }

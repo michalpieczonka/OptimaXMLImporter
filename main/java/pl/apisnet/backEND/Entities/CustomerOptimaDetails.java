@@ -23,6 +23,8 @@ public class CustomerOptimaDetails {
     @Column(name = "OptimaPath")
     private String OptimaPath;
 
+    @OneToOne(mappedBy = "customerOptimaDetails")
+    private Customer customer;
 
     public CustomerOptimaDetails(){
     }
