@@ -1,6 +1,8 @@
 package pl.apisnet.userUI;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +13,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import pl.apisnet.backEND.XMLFiles.Services.AddPZDocumentService;
 import pl.apisnet.backEND.XMLFiles.Services.ImportItemsToOptimaService;
@@ -24,10 +29,7 @@ import pl.apisnet.backEND.XMLFiles.XMLSubiektParser;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class ImportXMLFileScreenController implements Initializable {
 
@@ -45,20 +47,21 @@ public class ImportXMLFileScreenController implements Initializable {
     boolean[] selectedFileType = new boolean[]{false,false,false}; // Array for storing logic for selected type of file
                                                  // 1 - iHurt | 2 - Subiekt | 3 - Excel
 
+    private static final String IDLE_BUTTON_STYLE = "-fx-background-color:  #fff; -fx-background-radius: 8px;";
+    private static final String HOVERED_BUTTON_STYLE = "-fx-background-color: #f57500; -fx-background-radius: 8px;";
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mainOptima = optimaHolderInstance.getMainOptima();
         optimaFirmName.setText(mainOptima.getOptimaCompanyName());
-        processImportButton.setVisible(false);
-        addMissingEansButton.setVisible(false);
-        itemsTable.getColumns().clear();
-        progressIn.setVisible(false);
-        progressIn.setStyle(" -fx-progress-color: #d85c2c");
-        loadLabel.setVisible(false);
-        addPZDocumentButton.setVisible(false);
-        addPZDocumentButton.setText("Utwórz dokument PZ");
+        makeDesign(); //Styling buttons,labels etc.
+
     }
 
+    @FXML
+    private StackPane mainPane;
+    @FXML
+    private JFXButton backButton;
 
     @FXML
     private Label loadLabel;
@@ -103,6 +106,57 @@ public class ImportXMLFileScreenController implements Initializable {
     //Exiting from app
     @FXML
     void exit(ActionEvent event) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setStyle("-fx-background-color: #525252");
+
+        Text exitHeader = new Text("Wyjście");
+        exitHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
+        exitHeader.setFill(Color.WHITE);
+        Text exitConfirmation = new Text("Czy na pewno chcesz wyjść z programu ?");
+        exitConfirmation.setStyle("-fx-font-weight: bold; -fx-font-size: 13;");
+        exitConfirmation.setFill(Color.WHITE);
+
+        dialogLayout.setHeading(exitHeader);
+        dialogLayout.setBody(exitConfirmation);
+
+        JFXButton ok = new JFXButton("Tak");
+        JFXButton cancel = new JFXButton ("Anuluj");
+
+        ok.setStyle(IDLE_BUTTON_STYLE);
+        ok.setOnMouseEntered(e -> ok.setStyle(HOVERED_BUTTON_STYLE));
+        ok.setOnMouseExited(e -> ok.setStyle(IDLE_BUTTON_STYLE));
+
+        cancel.setStyle(IDLE_BUTTON_STYLE);
+        cancel.setOnMouseEntered(e -> cancel.setStyle(HOVERED_BUTTON_STYLE));
+        cancel.setOnMouseExited(e -> cancel.setStyle(IDLE_BUTTON_STYLE));
+
+        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        ok.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                mainOptima.disconnectFromOptima();
+                System.exit(0);
+            }
+        });
+
+        cancel.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                dialog.close();
+            }
+
+        });
+
+        dialogLayout.setActions(ok,cancel);
+        dialog.show();
+
+    }
+
+
+
+    //Moving to UserDashboardScreen
+    @FXML
+    void moveBack(ActionEvent event) {
 
     }
 
@@ -204,6 +258,9 @@ public class ImportXMLFileScreenController implements Initializable {
         imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,"  Wszystkie towary zostały pomyślnie dodane do Optima !");
+                alert.setHeaderText("  Sukces !");
+                alert.show();
                 loadLabel.setVisible(false);
                 insertDataIntoTable(importer.getPZItemsList());
                 addPZDocumentButton.setDisable(false);
@@ -214,9 +271,11 @@ public class ImportXMLFileScreenController implements Initializable {
         imp.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie udalo sie dodac wszystkich brakujących towarów do Optima !");
+                alert.setHeaderText("  Błąd !");
+                alert.show();
                 addPZDocumentButton.setDisable(true);
                 loadLabel.setVisible(false);
-                System.out.println("nie udalo sie dodac towaru");
             }
         });
         imp.restart();
@@ -236,7 +295,10 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
-                System.out.println("superancko zaimportowane");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,"  Dokument przyjęcia zewnętrznego został utworzony w Optima!");
+                alert.setHeaderText("  Sukces !");
+                alert.show();
+                addPZDocumentButton.setDisable(true);
             }
         });
 
@@ -245,7 +307,10 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
-                System.out.println("Zjebalo sie i nic nie dziala");
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Dokument przyjęcia zewnętrznego nie został utworzony w Optima ! Wystąpił błąd !");
+                alert.setHeaderText("  Błąd !");
+                alert.show();
+                addPZDocumentButton.setDisable(true);
             }
         });
         imp.restart();
@@ -273,6 +338,12 @@ public class ImportXMLFileScreenController implements Initializable {
     private void processImport(){
         if (mainOptima.checkOptimaConnection()){
             try{
+                //Disabling all other buttons to avoid creating PZ with missing EANS(Items)
+                processImportButton.setDisable(true);
+                subiektButton.setDisable(true);
+                iHurtButton.setDisable(true);
+                excelButton.setDisable(true);
+
                 loadLabel.setVisible(true);
                 loadLabel.setText("Przetwarzanie wczytanego pliku");
                 ImportXmlService impXmlService = new ImportXmlService(importer);
@@ -281,11 +352,7 @@ public class ImportXMLFileScreenController implements Initializable {
                 impXmlService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                     @Override
                     public void handle(WorkerStateEvent workerStateEvent) {
-                        //Disabling all other buttons to avoid creating PZ with missing EANS(Items)
-                        processImportButton.setDisable(true);
-                        subiektButton.setDisable(true);
-                        iHurtButton.setDisable(true);
-                        excelButton.setDisable(true);
+
                         loadLabel.setVisible(false);
 
                         //Inserting data into Table
@@ -317,7 +384,6 @@ public class ImportXMLFileScreenController implements Initializable {
                     @Override
                     public void handle(WorkerStateEvent workerStateEvent) {
                         loadLabel.setVisible(false);
-                        System.out.println("Zjebalo sie i nic nie dziala");
                     }
                 });
                 impXmlService.restart();
@@ -396,6 +462,27 @@ public class ImportXMLFileScreenController implements Initializable {
         }
     }
 
+    /**
+     * Method responsible for hovering buttons
+     */
+    private void makeDesign(){
+        optimaFirmName.setTextFill(Color.rgb(245,117,0));
+        processImportButton.setVisible(false);
+        addMissingEansButton.setVisible(false);
+        itemsTable.getColumns().clear();
+        progressIn.setVisible(false);
+        progressIn.setStyle(" -fx-progress-color: #d85c2c");
+        loadLabel.setVisible(false);
+        addPZDocumentButton.setVisible(false);
+        addPZDocumentButton.setText("Utwórz dokument PZ");
+
+        List<Button> buttonsList = Arrays.asList(iHurtButton,subiektButton,excelButton,processImportButton,addMissingEansButton,addPZDocumentButton,exitButton,backButton);
+        for (Button b: buttonsList){
+            b.setStyle(IDLE_BUTTON_STYLE);
+            b.setOnMouseEntered(e -> b.setStyle(HOVERED_BUTTON_STYLE));
+            b.setOnMouseExited(e -> b.setStyle(IDLE_BUTTON_STYLE));
+        }
+    }
 
 
 }

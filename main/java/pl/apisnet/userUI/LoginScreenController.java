@@ -117,6 +117,7 @@ public class LoginScreenController implements Initializable {
      */
     @FXML
     void loginToOptima(ActionEvent event) {
+        setLastSettingsButton.setDisable(true);
         mainOptima = null;
         if (optimaInstallationDir.getText() != null && !optimaOperatorField.getText().isBlank() && optimaCompanyName.getSelectionModel().getSelectedItem() !=null ){
             mainOptima = new Optima(optimaOperatorField.getText(),"",optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
@@ -143,8 +144,10 @@ public class LoginScreenController implements Initializable {
                 }
 
             }else{
+                mainOptima.disconnectFromOptima();
+                mainOptima = null;
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
-                alert.setHeaderText("  Autoryzacja nie możliwa !");
+                alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
                 alert.show();
             }
         }else {
@@ -169,8 +172,38 @@ public class LoginScreenController implements Initializable {
     }
     @FXML
     void setLastOptimaSettings(ActionEvent event) {
+        optimaLoginButton.setDisable(true);
         mainOptima = null;
+        CustomerOptimaDetails optimaDetailsTmp = DatabaseHolder.getInstance().getDbConf().getCustomer().getCustomerOptimaDetails();
+        mainOptima = new Optima(optimaDetailsTmp.getOperator(),optimaDetailsTmp.getOperatorPassword(),optimaDetailsTmp.getCompanyName(),optimaDetailsTmp.getOptimaPath());
 
+        if (mainOptima.connectToOptima()){
+            optimaMain = OptimaHolder.getInstance();
+            optimaMain.setMainOptima(mainOptima);
+           try{
+                Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
+                stage.close();
+                Stage newStage = new Stage();
+                Parent root = FXMLLoader.load(getClass().getResource(("importXMLFileScreen.fxml")));
+                Scene scene = new Scene(root);
+                newStage.initStyle(StageStyle.DECORATED);
+                newStage.setTitle("AIMPORTER");
+                newStage.setScene(scene);
+                newStage.show();
+            }catch(IOException e){
+                System.out.println(e);
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Skontaktuj się z dostawcą oprogramowania !");
+                alert.setHeaderText("  Wystąpił nieoczekiwany błąd !");
+                alert.show();
+            }
+
+        }else{
+            mainOptima.disconnectFromOptima();
+            mainOptima = null;
+            Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
+            alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
+            alert.show();
+        }
     }
 
     /**

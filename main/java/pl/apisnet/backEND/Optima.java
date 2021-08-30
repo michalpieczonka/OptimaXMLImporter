@@ -10,6 +10,7 @@ import com.jacob.com.Variant;
 public class Optima {
     private final String optimaDLL = "OptimaLIBB.OptimaUtils"; //Class DLL library created in C# using Optima API
     private final String optimaLoginClassInDLL = "loginToOptima"; //Name of login function in DLL library created in C# using Optima API
+    private final String optimaLogoutClassInDLL = "logoutFromOptima"; //Name of logout and unlock Optima function in DLL library created in C# using Optima API
     private boolean optimaConnection; //Flag responsible for checking if connection with Optima was sucessfully created
     private String optimaUserName;
     private String optimaUserPassword;
@@ -50,6 +51,7 @@ public class Optima {
      * Disconnecting from OptimaAPI trought dll -> OptimaLIBB.dll
      */
     public void disconnectFromOptima(){
+        Dispatch.call(optimaProgramID,optimaLogoutClassInDLL);
         optimaProgramID = null;
         optimaConnection = false;
     }
