@@ -10,13 +10,18 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import pl.apisnet.backEND.XMLFiles.Services.AddPZDocumentService;
 import pl.apisnet.backEND.XMLFiles.Services.ImportItemsToOptimaService;
 import pl.apisnet.backEND.XMLFiles.Services.ImportXmlService;
@@ -28,6 +33,7 @@ import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLSubiektParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -102,6 +108,8 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private JFXButton addPZDocumentButton;
 
+    @FXML
+    private JFXButton resetAllButton;
 
     //Exiting from app
     @FXML
@@ -157,7 +165,61 @@ public class ImportXMLFileScreenController implements Initializable {
     //Moving to UserDashboardScreen
     @FXML
     void moveBack(ActionEvent event) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setStyle("-fx-background-color: #525252");
 
+        Text exitHeader = new Text("Powrót");
+        exitHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
+        exitHeader.setFill(Color.WHITE);
+        Text exitConfirmation = new Text("Czy na pewno chcesz wrócić do poprzedniego ekranu ?");
+        exitConfirmation.setStyle("-fx-font-weight: bold; -fx-font-size: 13;");
+        exitConfirmation.setFill(Color.WHITE);
+
+        dialogLayout.setHeading(exitHeader);
+        dialogLayout.setBody(exitConfirmation);
+
+        JFXButton ok = new JFXButton("Tak");
+        JFXButton cancel = new JFXButton ("Anuluj");
+
+        ok.setStyle(IDLE_BUTTON_STYLE);
+        ok.setOnMouseEntered(e -> ok.setStyle(HOVERED_BUTTON_STYLE));
+        ok.setOnMouseExited(e -> ok.setStyle(IDLE_BUTTON_STYLE));
+
+        cancel.setStyle(IDLE_BUTTON_STYLE);
+        cancel.setOnMouseEntered(e -> cancel.setStyle(HOVERED_BUTTON_STYLE));
+        cancel.setOnMouseExited(e -> cancel.setStyle(IDLE_BUTTON_STYLE));
+
+        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        ok.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                mainOptima.disconnectFromOptima();
+                try{
+                    Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
+                    stage.close();
+                    Stage newStage = new Stage();
+                    Parent root = FXMLLoader.load(getClass().getResource(("loginScreen.fxml")));
+                    Scene scene = new Scene(root);
+                    newStage.initStyle(StageStyle.DECORATED);
+                    newStage.setTitle("AIMPORTER");
+                    newStage.setScene(scene);
+                    newStage.show();
+                }catch (IOException e){
+                    System.exit(0);
+                }
+            }
+        });
+
+        cancel.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                dialog.close();
+            }
+
+        });
+
+        dialogLayout.setActions(ok,cancel);
+        dialog.show();
     }
 
 //Buttons controllers - responsible for importing actions
@@ -258,7 +320,7 @@ public class ImportXMLFileScreenController implements Initializable {
         imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,"  Wszystkie towary zostały pomyślnie dodane do Optima !");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,"Wszystkie towary zostały pomyślnie dodane do Optima !");
                 alert.setHeaderText("  Sukces !");
                 alert.show();
                 loadLabel.setVisible(false);
@@ -271,7 +333,7 @@ public class ImportXMLFileScreenController implements Initializable {
         imp.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie udalo sie dodac wszystkich brakujących towarów do Optima !");
+                Alert alert = new Alert(Alert.AlertType.ERROR,"Nie udalo sie dodac wszystkich brakujących towarów do Optima !");
                 alert.setHeaderText("  Błąd !");
                 alert.show();
                 addPZDocumentButton.setDisable(true);
@@ -295,10 +357,12 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,"  Dokument przyjęcia zewnętrznego został utworzony w Optima!");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,"Dokument przyjęcia zewnętrznego został utworzony w Optima!");
                 alert.setHeaderText("  Sukces !");
                 alert.show();
                 addPZDocumentButton.setDisable(true);
+                resetAllButton.setText("Zresetuj i importuj\nkolejny plik");
+                resetAllButton.setVisible(true);
             }
         });
 
@@ -475,13 +539,37 @@ public class ImportXMLFileScreenController implements Initializable {
         loadLabel.setVisible(false);
         addPZDocumentButton.setVisible(false);
         addPZDocumentButton.setText("Utwórz dokument PZ");
+        resetAllButton.setVisible(false);
 
-        List<Button> buttonsList = Arrays.asList(iHurtButton,subiektButton,excelButton,processImportButton,addMissingEansButton,addPZDocumentButton,exitButton,backButton);
+        List<Button> buttonsList = Arrays.asList(iHurtButton,subiektButton,excelButton,processImportButton,addMissingEansButton,addPZDocumentButton,exitButton,backButton,resetAllButton);
         for (Button b: buttonsList){
             b.setStyle(IDLE_BUTTON_STYLE);
             b.setOnMouseEntered(e -> b.setStyle(HOVERED_BUTTON_STYLE));
             b.setOnMouseExited(e -> b.setStyle(IDLE_BUTTON_STYLE));
         }
+    }
+
+    /**
+     * Method responsible for reseting all stored items to let customer import next file to Optima
+     */
+    @FXML
+    void resetImportingDetails(ActionEvent event) {
+        itemsTable.getColumns().clear();
+        importer.getPZItemsList().clear();
+        fileToImportPath = "";
+        iHurtButton.setDisable(false);
+        subiektButton.setDisable(false);
+        excelButton.setDisable(false);
+
+        processImportButton.setVisible(false);
+        processImportButton.setDisable(false);
+
+        addMissingEansButton.setVisible(false);
+        addMissingEansButton.setDisable(false);
+
+        addPZDocumentButton.setDisable(false);
+        addPZDocumentButton.setVisible(false);
+        resetAllButton.setVisible(false);
     }
 
 

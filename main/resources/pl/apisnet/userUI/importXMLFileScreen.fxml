@@ -13,7 +13,6 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-
 <StackPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.apisnet.userUI.ImportXMLFileScreenController">
    <children>
       <AnchorPane fx:id="mainAnchorPane" prefHeight="768.0" prefWidth="1024.0" style="-fx-background-image: url(pl/apisnet/userUI/mainUserPanelBg.png);">
@@ -127,7 +126,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="addPZDocumentButton" buttonType="RAISED" layoutX="428.0" layoutY="29.0" onAction="#createPZDocument" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
+                  <JFXButton fx:id="addPZDocumentButton" buttonType="RAISED" layoutX="427.0" layoutY="29.0" onAction="#createPZDocument" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
                      <effect>
                         <DropShadow />
                      </effect>
@@ -141,6 +140,14 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
+                  <JFXButton fx:id="resetAllButton" buttonType="RAISED" layoutX="622.0" layoutY="29.0" onAction="#resetImportingDetails" prefHeight="79.0" prefWidth="160.0" style="-fx-background-color: #fff; -fx-background-radius: 10px;" textAlignment="CENTER">
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </JFXButton>
                </children>
                <effect>
                   <DropShadow>

@@ -71,9 +71,15 @@ public class DatabaseConf {
             System.out.println(e);
         } finally{
             session.close();
-            System.out.println("zrobione");
         }
         return updateResult;
+    }
+
+    public void logoutCustomer(){
+        factory.close();
+        factory = null;
+        configuration = null;
+        customer = null;
     }
 
 }

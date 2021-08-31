@@ -2,17 +2,23 @@ package pl.apisnet.userUI;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -25,6 +31,8 @@ import pl.apisnet.backEND.Optima;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class LoginScreenController implements Initializable {
@@ -45,18 +53,17 @@ public class LoginScreenController implements Initializable {
         optimaLastOperator.setTextFill(Color.rgb(245,117,0));
         optimaLastDir.setTextFill(Color.rgb(245,117,0));
 
-        optimaLoginButton.setStyle(IDLE_BUTTON_STYLE);
-        optimaLoginButton.setOnMouseEntered(e -> optimaLoginButton.setStyle(HOVERED_BUTTON_STYLE));
-        optimaLoginButton.setOnMouseExited(e -> optimaLoginButton.setStyle(IDLE_BUTTON_STYLE));
+        List<Button> buttonsList = Arrays.asList(optimaLoginButton,optimaDirButton,setLastSettingsButton,exitButton,logoutButton);
+        for (Button b: buttonsList){
+            b.setStyle(IDLE_BUTTON_STYLE);
+            b.setOnMouseEntered(e -> b.setStyle(HOVERED_BUTTON_STYLE));
+            b.setOnMouseExited(e -> b.setStyle(IDLE_BUTTON_STYLE));
+        }
 
-        optimaDirButton.setStyle(IDLE_BUTTON_STYLE);
-        optimaDirButton.setOnMouseEntered(e -> optimaDirButton.setStyle(HOVERED_BUTTON_STYLE));
-        optimaDirButton.setOnMouseExited(e -> optimaDirButton.setStyle(IDLE_BUTTON_STYLE));
-
-        setLastSettingsButton.setStyle(IDLE_BUTTON_STYLE);
-        setLastSettingsButton.setOnMouseEntered(e -> setLastSettingsButton.setStyle(HOVERED_BUTTON_STYLE));
-        setLastSettingsButton.setOnMouseExited(e -> setLastSettingsButton.setStyle(IDLE_BUTTON_STYLE));
     }
+
+    @FXML
+    private StackPane mainPane;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -109,6 +116,125 @@ public class LoginScreenController implements Initializable {
     @FXML
     private JFXButton setLastSettingsButton;
 
+    @FXML
+    private JFXButton logoutButton;
+
+    @FXML
+    private JFXButton exitButton;
+
+    /**
+     * Method responsible for closing application
+     */
+    @FXML
+    void exit(ActionEvent event) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setStyle("-fx-background-color: #525252");
+
+        Text exitHeader = new Text("Wyjście");
+        exitHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
+        exitHeader.setFill(Color.WHITE);
+        Text exitConfirmation = new Text("Czy na pewno chcesz wyjść z programu ?");
+        exitConfirmation.setStyle("-fx-font-weight: bold; -fx-font-size: 13;");
+        exitConfirmation.setFill(Color.WHITE);
+
+        dialogLayout.setHeading(exitHeader);
+        dialogLayout.setBody(exitConfirmation);
+
+        JFXButton ok = new JFXButton("Tak");
+        JFXButton cancel = new JFXButton ("Anuluj");
+
+        ok.setStyle(IDLE_BUTTON_STYLE);
+        ok.setOnMouseEntered(e -> ok.setStyle(HOVERED_BUTTON_STYLE));
+        ok.setOnMouseExited(e -> ok.setStyle(IDLE_BUTTON_STYLE));
+
+        cancel.setStyle(IDLE_BUTTON_STYLE);
+        cancel.setOnMouseEntered(e -> cancel.setStyle(HOVERED_BUTTON_STYLE));
+        cancel.setOnMouseExited(e -> cancel.setStyle(IDLE_BUTTON_STYLE));
+
+        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        ok.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                System.exit(0);
+            }
+        });
+
+        cancel.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                dialog.close();
+            }
+
+        });
+
+        dialogLayout.setActions(ok,cancel);
+        dialog.show();
+    }
+
+
+    /**
+     * Method responsible for logging out from Customer account
+     */
+    @FXML
+    void logout(ActionEvent event) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setStyle("-fx-background-color: #525252");
+
+        Text exitHeader = new Text("Wyjście");
+        exitHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
+        exitHeader.setFill(Color.WHITE);
+        Text exitConfirmation = new Text("Czy na pewno chcesz wylogować się z programu ?");
+        exitConfirmation.setStyle("-fx-font-weight: bold; -fx-font-size: 13;");
+        exitConfirmation.setFill(Color.WHITE);
+
+        dialogLayout.setHeading(exitHeader);
+        dialogLayout.setBody(exitConfirmation);
+
+        JFXButton ok = new JFXButton("Tak");
+        JFXButton cancel = new JFXButton ("Anuluj");
+
+        ok.setStyle(IDLE_BUTTON_STYLE);
+        ok.setOnMouseEntered(e -> ok.setStyle(HOVERED_BUTTON_STYLE));
+        ok.setOnMouseExited(e -> ok.setStyle(IDLE_BUTTON_STYLE));
+
+        cancel.setStyle(IDLE_BUTTON_STYLE);
+        cancel.setOnMouseEntered(e -> cancel.setStyle(HOVERED_BUTTON_STYLE));
+        cancel.setOnMouseExited(e -> cancel.setStyle(IDLE_BUTTON_STYLE));
+
+        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        ok.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                try{
+                    DatabaseHolder.getInstance().getDbConf().logoutCustomer();
+                    Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
+                    stage.close();
+                    Stage newStage = new Stage();
+                    Parent root = FXMLLoader.load(getClass().getResource(("mainLoginScreen.fxml")));
+                    Scene scene = new Scene(root);
+                    newStage.initStyle(StageStyle.TRANSPARENT);
+                    newStage.setTitle("AIMPORTER");
+                    newStage.setScene(scene);
+                    newStage.show();
+                }catch (IOException e){
+
+                }
+            }
+        });
+
+        cancel.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent t) {
+                dialog.close();
+            }
+
+        });
+
+        dialogLayout.setActions(ok,cancel);
+        dialog.show();
+
+
+    }
 
     /**
      * Method responsible for checking if User input data are correct to get connection to Optima
