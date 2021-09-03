@@ -6,6 +6,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import pl.apisnet.backEND.Entities.Customer;
 import pl.apisnet.backEND.Entities.CustomerOptimaDetails;
+import pl.apisnet.backEND.Entities.OptimaEntity;
 
 import javax.persistence.Query;
 /**
@@ -16,12 +17,15 @@ public class DatabaseConf {
     private SessionFactory factory; //Factory object for sessions
     private Customer customer;
 
+    private OptimaEntity optimaEnt;
+
 
     public DatabaseConf(){
         this.configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml"); //Config file
         configuration.addAnnotatedClass(Customer.class); //Customer class
         configuration.addAnnotatedClass(CustomerOptimaDetails.class); //Customer optima details class
+        configuration.addAnnotatedClass(OptimaEntity.class); //Optima version class
     }
 
     /**
@@ -80,6 +84,24 @@ public class DatabaseConf {
         factory = null;
         configuration = null;
         customer = null;
+    }
+
+    public String getGlobalOptimaVersion(){
+        boolean updateResult = false;
+        Session session = null;
+        session = factory.getCurrentSession();
+        String queryString = "from OptimaEntity oe where oe.Id = :id"; //Main query
+        session.beginTransaction();
+        Query query = session.createQuery(queryString);
+        query.setParameter("id",1);
+        try{
+            this.optimaEnt = (OptimaEntity)query.getSingleResult();
+        } catch (Exception e){
+            System.out.println(e);
+        } finally{
+            session.close();
+        }
+        return optimaEnt.getOptimaVersion();
     }
 
 }

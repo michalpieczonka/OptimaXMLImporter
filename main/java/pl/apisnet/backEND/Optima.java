@@ -11,7 +11,10 @@ public class Optima {
     private final String optimaDLL = "OptimaLIBB.OptimaUtils"; //Class DLL library created in C# using Optima API
     private final String optimaLoginClassInDLL = "loginToOptima"; //Name of login function in DLL library created in C# using Optima API
     private final String optimaLogoutClassInDLL = "logoutFromOptima"; //Name of logout and unlock Optima function in DLL library created in C# using Optima API
+    private final String optimaVersionCheckerClassInDLL = "checkOptimaVersion"; //Name of checking version class in DLL library to check what is Optima Version
+
     private boolean optimaConnection; //Flag responsible for checking if connection with Optima was sucessfully created
+
     private String optimaUserName;
     private String optimaUserPassword;
     private String optimaCompanyName;
@@ -71,5 +74,10 @@ public class Optima {
     }
     public String getOptimaCompanyName() {
         return optimaCompanyName;
+    }
+
+    public String getOptimaVersion(){
+        Variant optimaVersion = Dispatch.call(optimaProgramID, optimaVersionCheckerClassInDLL, optimaInstallationPath);
+        return optimaVersion.getString();
     }
 }

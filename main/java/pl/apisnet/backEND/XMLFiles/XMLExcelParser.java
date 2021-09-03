@@ -39,12 +39,13 @@ public class XMLExcelParser extends XMLImporter{
      * File is correct only if
      */
     @Override
-    public void readXmlFileHeaders() {
+    public void readXmlFileHeaders()  {
         List<String> correctHeaderNames = Arrays.asList("Symbol","symbol","Nazwa towaru","nazwa towaru","Kod kreskowy","kod kreskowy","stawka vat" +
                 "EAN","ean","Jednostka miary", "miara", "J EW","J_EW","j ew","j ew","Stawka Vat", "Stawka_VAT","stawka_vat" +
                 "stawka_VAT","ilosc","ilość","Ilość","Cena","cena","cena po upuście","cena_po_upuście","cena_po_upuscie","cena po upuscie","Cena po upuście");
 
         List<String> header = new ArrayList<>();
+
         try{
             FileInputStream inputStream = new FileInputStream(xmlFilePath);
             XSSFWorkbook excelFile = new XSSFWorkbook(inputStream); //Getting selected Excel file

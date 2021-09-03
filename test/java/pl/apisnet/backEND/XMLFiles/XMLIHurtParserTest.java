@@ -58,14 +58,14 @@ class XMLIHurtParserTest {
     @Test
     void pzListShouldContains2Elements(){
         mainOptima.connectToOptima();
-        iHurt.readXmlFileHeaders();
+        //iHurt.readXmlFileHeaders();
         assertEquals(2,iHurt.getPZItemsList().size());
     }
 
     @Test
     void pzListShouldContains2ElementsWithSpecifiedRequirements(){
         mainOptima.connectToOptima();
-        iHurt.readXmlFileHeaders();
+     //   iHurt.readXmlFileHeaders();
      //  assertAll(
      //          () -> assertEquals("5904000044376",iHurt.getPZItemsList().get(0).getEAN()),
      //          () -> assertEquals("BONDEX281",iHurt.getPZItemsList().get(0).getSymbol()),

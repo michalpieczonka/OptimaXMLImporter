@@ -10,6 +10,8 @@ import pl.apisnet.backEND.XMLFiles.XMLObjects.SubiektXMLPZPosition;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,6 +94,11 @@ public class XMLSubiektParser extends XMLImporter{
           for (int i=0; i<result1.size();i++){
               Res1 = result1.get(i).split(",");
               Res2 = result2.get(i).split(",");
+
+              byte[] bytes_ISO8852 = Res2[4].getBytes("ISO-8859-1");
+              String UTF82ConvertedString = new String(bytes_ISO8852);
+              System.out.println(UTF82ConvertedString);
+
               //Uklad elementow:
               //symbol - 2Res[1], ilosc - 1Res[10]? ,EAN - 2Res[3], nazwa - 2Res[4], jEW - 1Res[9], stawkaVat - 1Res[15]
               //Cena - tutaj problem subiekt nie eksportuje ceny po rabacie, tylko cene netto i % rabatu -> trzeba policzyc

@@ -27,17 +27,20 @@ import java.util.stream.Collectors;
 public class tempMain {
 
     public static void main(String[] args) throws IOException {
-       Optima mainOptima = new Optima("Admin","","TEST2","C:/Program Files (x86)/Comarch ERP Optima");
-       System.out.println(mainOptima.connectToOptima());
+       Optima mainOptima = new Optima("Admin","","TEST12","C:/Program Files (x86)/Comarch ERP Optima");
+      System.out.println(mainOptima.connectToOptima());
        System.out.println(mainOptima.getOptimaProgramID());
-       System.out.println("odpalanie wczytania xml");
-       XMLIHurtParser iHurt = new XMLIHurtParser("FS_8642_2021_RST_f.xml",mainOptima);
-       iHurt.readXmlFileHeaders();
-       System.out.println("wczytanie xml gotowe");
-       iHurt.addMissingEans();
-       System.out.println("dodawnaie pz");
-       iHurt.addNewPZ();
-
+      System.out.println("odpalanie wczytania xml");
+    //   XMLIHurtParser iHurt = new XMLIHurtParser("FS_8642_2021_RST_f.xml",mainOptima);
+     //  iHurt.readXmlFileHeaders();
+      // System.out.println("wczytanie xml gotowe");
+      // iHurt.addMissingEans();
+      // System.out.println("dodawnaie pz");
+      // iHurt.addNewPZ();
+       importer2tmp tmp = new importer2tmp("FS_15012_2021_RST_f.xml",mainOptima);
+       tmp.readXmlFileHeaders();
+       tmp.addMissingEans();
+       tmp.addNewPZ();
     }
 
 }

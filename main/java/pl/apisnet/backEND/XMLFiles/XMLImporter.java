@@ -4,6 +4,7 @@ package pl.apisnet.backEND.XMLFiles;
 import com.jacob.com.Dispatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 

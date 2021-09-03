@@ -111,6 +111,8 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private JFXButton resetAllButton;
 
+    String fileName = "";
+
     //Exiting from app
     @FXML
     void exit(ActionEvent event) {
@@ -228,23 +230,28 @@ public class ImportXMLFileScreenController implements Initializable {
     void importExcel(ActionEvent event) {
         selectXmlFile();
         if (!fileToImportPath.isBlank()){
-            importer = new XMLExcelParser(fileToImportPath,mainOptima);
-            List<String> avliableSheets = ((XMLExcelParser)importer).getAvailableSheets();
+            if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("xls") || fileToImportPath.substring(fileToImportPath.length() - 4).equals("xlsx") ){
+                importer = new XMLExcelParser(fileToImportPath,mainOptima);
+                List<String> avliableSheets = ((XMLExcelParser)importer).getAvailableSheets();
 
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(avliableSheets.get(0), avliableSheets);
-            dialog.setTitle("Wymagane działanie");
-            dialog.setHeaderText("Wybierz arkusz, z którego chcesz zaimportować dane !");
+                ChoiceDialog<String> dialog = new ChoiceDialog<>(avliableSheets.get(0), avliableSheets);
+                dialog.setTitle("Wymagane działanie");
+                dialog.setHeaderText("Wybierz arkusz, z którego chcesz zaimportować dane !");
 
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()){
-                ((XMLExcelParser) importer).setSheetName(result.get());
-                processImportButton.setVisible(true);
-            } else if (result.isEmpty()){
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego arkusza !");
-                alert.setHeaderText("  Brak pliku !");
+                Optional<String> result = dialog.showAndWait();
+                if (result.isPresent()){
+                    ((XMLExcelParser) importer).setSheetName(result.get());
+                    processImportButton.setVisible(true);
+                } else if (result.isEmpty()){
+                    Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego arkusza !");
+                    alert.setHeaderText("  Brak pliku !");
+                    alert.show();
+                }
+            } else{
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setHeaderText("  Niepoprawny typ pliku !");
                 alert.show();
             }
-
         }else{
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XLSX!");
             alert.setHeaderText("  Brak pliku !");
@@ -257,8 +264,14 @@ public class ImportXMLFileScreenController implements Initializable {
     void importIHurt(ActionEvent event) {
         selectXmlFile();
         if(!fileToImportPath.isBlank()){
-            processImportButton.setVisible(true);
-            importer = new XMLIHurtParser(fileToImportPath, mainOptima);
+            if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("xml")){
+                processImportButton.setVisible(true);
+                importer = new XMLIHurtParser(fileToImportPath, mainOptima);
+            } else{
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setHeaderText("  Niepoprawny typ pliku !");
+                alert.show();
+            }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XML !");
             alert.setHeaderText("  Brak pliku !");
@@ -271,8 +284,14 @@ public class ImportXMLFileScreenController implements Initializable {
     void importSubiekt(ActionEvent event) {
         selectXmlFile();
         if(!fileToImportPath.isBlank()){
-            processImportButton.setVisible(true);
-            importer = new XMLSubiektParser(fileToImportPath, mainOptima);
+            if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("epp")){
+                processImportButton.setVisible(true);
+                importer = new XMLSubiektParser(fileToImportPath, mainOptima);
+            } else{
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setHeaderText("  Niepoprawny typ pliku !");
+                alert.show();
+            }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku EPP !");
             alert.setHeaderText("  Brak pliku !");
@@ -292,23 +311,28 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     void addMissingEansToOptima(ActionEvent event) {
         addMissingEansButton.setDisable(true);
-        for (XMLPZPosition item: importer.getPZItemsList()){
-            if (!item.isIsjEWCorrect()){
-                ChoiceDialog<String> dialog = new ChoiceDialog<>("szt", correctJEWList);
-                dialog.setTitle("Wymagane działanie");
-                dialog.setHeaderText("Towar "+item.getSymbol()+" posiada niepoprawnie zdefiniowaną jednostkę miary !\n"+item.getjEW()+" jest niepoprawna !");
-                dialog.setContentText("Aby usunąć problem dostosuj jednostkę miary:");
+       boolean userMistake = true; //flag responsible for checking if user did not click cancel or exit button
+        while (userMistake == true){
+           for (XMLPZPosition item: importer.getPZItemsList()){
+               if (!item.isIsjEWCorrect()){
+                   ChoiceDialog<String> dialog = new ChoiceDialog<>("szt", correctJEWList);
+                   dialog.setTitle("Wymagane działanie");
+                   dialog.setHeaderText("Towar "+item.getSymbol()+" posiada niepoprawnie zdefiniowaną jednostkę miary !\n"+item.getjEW()+" jest niepoprawna !");
+                   dialog.setContentText("Aby usunąć problem dostosuj jednostkę miary:");
+                   Optional<String> result = dialog.showAndWait();
+                   if (result.isPresent()){
+                       item.setjEW(result.get());
+                       item.setIsjEWCorrect(true);
+                   }
+                   //else if (result.isEmpty()){
+                   //    System.out.println("Usunięto pozycje");
+                   //}
+               }
+           }
+           //If PZItemList still contains any item with wrong JEW while loop should run again
+           userMistake = importer.getPZItemsList().stream().anyMatch(p->p.isIsjEWCorrect() == false);
+       }
 
-                Optional<String> result = dialog.showAndWait();
-                if (result.isPresent()){
-                    item.setjEW(result.get());
-                    item.setIsjEWCorrect(true);
-                } else if (result.isEmpty()){
-                    System.out.println("Usunięto pozycje");
-                    importer.getPZItemsList().remove(item);
-                }
-            }
-        }
         //Using task to do not freez main JavaFX GUI thread
         loadLabel.setVisible(true);
         loadLabel.setText("Dodawanie brakujących pozycji");
@@ -393,6 +417,7 @@ public class ImportXMLFileScreenController implements Initializable {
         if (file !=null){
             processImportButton.setText("Wczytaj plik\n"+file.getName()+"\n do programu");
             fileToImportPath = file.getAbsolutePath();
+            fileName = file.getName();
         }
     }
 
@@ -554,6 +579,10 @@ public class ImportXMLFileScreenController implements Initializable {
      */
     @FXML
     void resetImportingDetails(ActionEvent event) {
+        resetImportDetails();
+    }
+
+    private void resetImportDetails(){
         itemsTable.getColumns().clear();
         importer.getPZItemsList().clear();
         fileToImportPath = "";

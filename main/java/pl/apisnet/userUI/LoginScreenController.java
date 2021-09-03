@@ -243,15 +243,89 @@ public class LoginScreenController implements Initializable {
      */
     @FXML
     void loginToOptima(ActionEvent event) {
-        setLastSettingsButton.setDisable(true);
         mainOptima = null;
         if (optimaInstallationDir.getText() != null && !optimaOperatorField.getText().isBlank() && optimaCompanyName.getSelectionModel().getSelectedItem() !=null ){
             mainOptima = new Optima(optimaOperatorField.getText(),"",optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
 
             if (mainOptima.connectToOptima()){
+                setLastSettingsButton.setDisable(true);
                 optimaMain = OptimaHolder.getInstance();
                 optimaMain.setMainOptima(mainOptima);
-                DatabaseHolder.getInstance().getDbConf().updateUserOptimaDetails(optimaOperatorField.getText(),optimaOperatorPassField.getText(),optimaCompanyName.getSelectionModel().getSelectedItem(),optimaInstallationDir.getText());
+
+               //Checking wheter Optima Customer Version is up to date (with version stored in Global Database)
+                //If Customer Optima version is up to date
+                if(optimaMain.getMainOptima().getOptimaVersion().equals(DatabaseHolder.getInstance().getDbConf().getGlobalOptimaVersion())) {
+                    //Update Customer Optima login details
+                    DatabaseHolder.getInstance().getDbConf().updateUserOptimaDetails(optimaOperatorField.getText(), optimaOperatorPassField.getText(), optimaCompanyName.getSelectionModel().getSelectedItem(), optimaInstallationDir.getText());
+                    try {
+                        Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
+                        stage.close();
+                        Stage newStage = new Stage();
+                        Parent root = FXMLLoader.load(getClass().getResource(("importXMLFileScreen.fxml")));
+                        Scene scene = new Scene(root);
+                        newStage.initStyle(StageStyle.DECORATED);
+                        newStage.setTitle("AIMPORTER");
+                        newStage.setScene(scene);
+                        newStage.show();
+                    } catch (IOException e) {
+                        System.out.println(e);
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "  Skontaktuj się z dostawcą oprogramowania !");
+                        alert.setHeaderText("  Wystąpił nieoczekiwany błąd !");
+                        alert.show();
+                    }
+                } //If Customer Optima version is not up to date
+                else{
+                    mainOptima.disconnectFromOptima();
+                    optimaLoginButton.setDisable(true);
+                    mainOptima = null;
+                    setLastSettingsButton.setDisable(true);
+                    Alert alert = new Alert(Alert.AlertType.ERROR,"Twoja wersja programu nie jest aktualna w stosunku do programu Comarch Optima !\nSkontaktuj się z dostawcą oprogramowania");
+                    alert.setHeaderText("  Autoryzacja nie możliwa !");
+                    alert.show();
+                }  //If input for Optima details is incorrect and can not login to Optima
+                }else{
+                    mainOptima.disconnectFromOptima();
+                    mainOptima = null;
+                    Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
+                    alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
+                    alert.show();
+                }
+
+
+
+
+        }else {
+            Alert alert = new Alert(Alert.AlertType.ERROR,"  Uzupełnij wszystkie pola !");
+            alert.setHeaderText("  Autoryzacja nie możliwa !");
+            alert.show();
+        }
+
+    }
+   /**
+     * Method responsible for geting from user Optima installation directory and setting it into variable optimaInstallationDir
+     */
+    @FXML
+    void setOptimaDirectory(ActionEvent event) {
+
+        final DirectoryChooser dirChooser = new DirectoryChooser();
+        File file = dirChooser.showDialog(mainAnchorPane.getScene().getWindow());
+        if (file !=null){
+            optimaInstallationDir.setText(file.getAbsolutePath());
+        }
+    }
+    @FXML
+    void setLastOptimaSettings(ActionEvent event) {
+        mainOptima = null;
+        CustomerOptimaDetails optimaDetailsTmp = DatabaseHolder.getInstance().getDbConf().getCustomer().getCustomerOptimaDetails();
+        mainOptima = new Optima(optimaDetailsTmp.getOperator(),optimaDetailsTmp.getOperatorPassword(),optimaDetailsTmp.getCompanyName(),optimaDetailsTmp.getOptimaPath());
+
+        if (mainOptima.connectToOptima()){
+            optimaLoginButton.setDisable(true);
+            optimaMain = OptimaHolder.getInstance();
+            optimaMain.setMainOptima(mainOptima);
+            //Checking wheter Optima Customer Version is up to date (with version stored in Global Database)
+            //If Customer Optima version is up to date
+            if(optimaMain.getMainOptima().getOptimaVersion().equals(DatabaseHolder.getInstance().getDbConf().getGlobalOptimaVersion())) {
                 try{
                     Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
                     stage.close();
@@ -269,60 +343,15 @@ public class LoginScreenController implements Initializable {
                     alert.show();
                 }
 
-            }else{
+            } else{ //If Customer Optima version is not up to date
+                optimaLoginButton.setDisable(true);
                 mainOptima.disconnectFromOptima();
                 mainOptima = null;
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
-                alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
-                alert.show();
+                setLastSettingsButton.setDisable(true);
+                Alert alert = new Alert(Alert.AlertType.ERROR,"Twoja wersja programu nie jest aktualna w stosunku do programu Comarch Optima !\nSkontaktuj się z dostawcą oprogramowania");
+                alert.setHeaderText("  Autoryzacja nie możliwa !");alert.show();
+
             }
-        }else {
-            Alert alert = new Alert(Alert.AlertType.ERROR,"  Uzupełnij wszystkie pola !");
-            alert.setHeaderText("  Autoryzacja nie możliwa !");
-            alert.show();
-        }
-
-    }
-
-    /**
-     * Method responsible for geting from user Optima installation directory and setting it into variable optimaInstallationDir
-     */
-    @FXML
-    void setOptimaDirectory(ActionEvent event) {
-
-        final DirectoryChooser dirChooser = new DirectoryChooser();
-        File file = dirChooser.showDialog(mainAnchorPane.getScene().getWindow());
-        if (file !=null){
-            optimaInstallationDir.setText(file.getAbsolutePath());
-        }
-    }
-    @FXML
-    void setLastOptimaSettings(ActionEvent event) {
-        optimaLoginButton.setDisable(true);
-        mainOptima = null;
-        CustomerOptimaDetails optimaDetailsTmp = DatabaseHolder.getInstance().getDbConf().getCustomer().getCustomerOptimaDetails();
-        mainOptima = new Optima(optimaDetailsTmp.getOperator(),optimaDetailsTmp.getOperatorPassword(),optimaDetailsTmp.getCompanyName(),optimaDetailsTmp.getOptimaPath());
-
-        if (mainOptima.connectToOptima()){
-            optimaMain = OptimaHolder.getInstance();
-            optimaMain.setMainOptima(mainOptima);
-           try{
-                Stage stage = (Stage) mainAnchorPane.getScene().getWindow();
-                stage.close();
-                Stage newStage = new Stage();
-                Parent root = FXMLLoader.load(getClass().getResource(("importXMLFileScreen.fxml")));
-                Scene scene = new Scene(root);
-                newStage.initStyle(StageStyle.DECORATED);
-                newStage.setTitle("AIMPORTER");
-                newStage.setScene(scene);
-                newStage.show();
-            }catch(IOException e){
-                System.out.println(e);
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Skontaktuj się z dostawcą oprogramowania !");
-                alert.setHeaderText("  Wystąpił nieoczekiwany błąd !");
-                alert.show();
-            }
-
         }else{
             mainOptima.disconnectFromOptima();
             mainOptima = null;

@@ -24,9 +24,7 @@ public class Customer {
     @JoinColumn(name = "Id_CustomerOptimaDetails")
     private CustomerOptimaDetails customerOptimaDetails;
 
-    public Customer(){
-
-    }
+    public Customer(){ }
 
     public Customer(String customerLogin, String customerPassword, int customerNIP) {
         this.CustomerLogin = customerLogin;
