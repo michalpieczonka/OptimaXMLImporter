@@ -7,8 +7,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
 import java.io.IOException;
-
 
 public class Main extends Application {
 
@@ -21,13 +21,6 @@ public class Main extends Application {
         openLoginScreen();
     }
 
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-
-
     private void openLoginScreen() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(("mainLoginScreen.fxml")));
         loginStage.setTitle("AIMPORTER");
@@ -35,5 +28,17 @@ public class Main extends Application {
         loginStage.setResizable(false);
         loginStage.show();
 
+    }
+
+    private void openErrorScreen() throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource(("errorScreen.fxml")));
+        loginStage.setTitle("AIMPORTER");
+        loginStage.setScene(new Scene(root, 450, 460));
+        loginStage.setResizable(false);
+        loginStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

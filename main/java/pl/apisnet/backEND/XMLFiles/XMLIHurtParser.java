@@ -7,15 +7,9 @@ package pl.apisnet.backEND.XMLFiles;
 import com.jacob.com.Dispatch;
 import com.jacob.com.SafeArray;
 import com.jacob.com.Variant;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
@@ -25,7 +19,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class XMLIHurtParser extends XMLImporter {
 
@@ -45,43 +38,47 @@ public class XMLIHurtParser extends XMLImporter {
      */
     @Override
     public void readXmlFileHeaders() {
-            try{
-                factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                xmlFile = builder.parse(xmlFilePath);
-                elementsInXml_Pozycja = xmlFile.getElementsByTagName("POZYCJA");
-                for (int i = 0; i  < elementsInXml_Pozycja.getLength(); i++){
-                    Node headerItem = elementsInXml_Pozycja.item(i);
-                    if (headerItem.getNodeType() == Node.ELEMENT_NODE){
-                        Element Pozycja = (Element) headerItem;
-                        //If item with given EAN number not exists
-                        if (!checkIfEanNumbersExists(Pozycja.getAttribute("KOD_KRESKOWY"))){
-                            if(UnitsOfMeasure.contains(Pozycja.getAttribute("J_EW").trim())){
-                                //Add this item to items list in PZ
-                                PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), false,true));
-                            } else{ //Here it can stack because if jEW is not same as oryginal in Optima then its problem
-                                PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), false,false));
-                            }
+        try{
+            factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            xmlFile = builder.parse(xmlFilePath);
+            elementsInXml_Pozycja = xmlFile.getElementsByTagName("POZYCJA");
+            for (int i = 0; i  < elementsInXml_Pozycja.getLength(); i++){
+                Node headerItem = elementsInXml_Pozycja.item(i);
+                if (headerItem.getNodeType() == Node.ELEMENT_NODE){
+                    Element Pozycja = (Element) headerItem;
+                    //If item with given EAN number not exists
+                    if (!checkIfEanNumbersExists(Pozycja.getAttribute("KOD_KRESKOWY"))){
+                        if(UnitsOfMeasure.contains(Pozycja.getAttribute("J_EW").trim())){
+                            //Add this item to items list in PZ
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), false,true,false));
+                        } else{ //Here it can stack because if jEW is not same as oryginal in Optima then its problem
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), false,false,false));
                         }
-                        else{
-                            //If item is already in Optima, then only add this item to items list in PZ
-                            if(UnitsOfMeasure.contains(Pozycja.getAttribute("J_EW").trim())){
-                                //Add this item to items list in PZ
-                                PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), true,true));
-                            } else{
-                                PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), true,false));
-                            }
+                    }
+                    else{
+                        //If item is already in Optima, then only add this item to items list in PZ
+                        if(UnitsOfMeasure.contains(Pozycja.getAttribute("J_EW").trim())){
+                            //Add this item to items list in PZ
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), true,true,true));
+                        } else{
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getAttribute("SYMBOL"),Integer.parseInt(Pozycja.getAttribute("ILOSC")),Double.parseDouble(Pozycja.getAttribute("CENA_PO_UPUSCIE")),Pozycja.getAttribute("KOD_KRESKOWY"),Pozycja.getAttribute("NAZWA_TOWARU"),Pozycja.getAttribute("J_EW"),Integer.parseInt(Pozycja.getAttribute("STAWKA_VAT")), true,false,true));
                         }
                     }
                 }
-
-            }catch (ParserConfigurationException e){
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            for(XMLPZPosition item: PZItemsList){
+                if (item.isAlreadyInOptima())
+                    checkIfItemIsCorrect(item);
+            }
+
+        }catch (ParserConfigurationException e){
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -120,7 +117,7 @@ public class XMLIHurtParser extends XMLImporter {
     }
 
 
-//
+    //
     String getOptimaFindEanClassName() {
         return optimaFindEanClassName;
     }

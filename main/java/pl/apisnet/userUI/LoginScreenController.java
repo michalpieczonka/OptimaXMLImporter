@@ -38,6 +38,8 @@ import java.util.ResourceBundle;
 public class LoginScreenController implements Initializable {
     private Optima mainOptima; //Temporary Optima object to check if given user input is correct to connect
     private OptimaHolder optimaMain; //Singletone -> GLOBAL instance of Optima class
+    private String[] optimaCompanys; //Array to store avaliable companys downloaded from Optima
+
 
     private static final String IDLE_BUTTON_STYLE = "-fx-background-color:  #fff; -fx-background-radius: 8px;";
     private static final String HOVERED_BUTTON_STYLE = "-fx-background-color: #f57500; -fx-background-radius: 8px;";
@@ -46,6 +48,9 @@ public class LoginScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle rb){
         loadCompanys(); //Loading companys from Optima
         loadLastUserLoginDetails(); //Loading data from last login
+
+
+
 
         //Settings labels color for last login data details
         optimaLastCompany.setTextFill(Color.rgb(245,117,0));
@@ -59,6 +64,7 @@ public class LoginScreenController implements Initializable {
             b.setOnMouseEntered(e -> b.setStyle(HOVERED_BUTTON_STYLE));
             b.setOnMouseExited(e -> b.setStyle(IDLE_BUTTON_STYLE));
         }
+
 
     }
 
@@ -252,7 +258,7 @@ public class LoginScreenController implements Initializable {
                 optimaMain = OptimaHolder.getInstance();
                 optimaMain.setMainOptima(mainOptima);
 
-               //Checking wheter Optima Customer Version is up to date (with version stored in Global Database)
+                //Checking wheter Optima Customer Version is up to date (with version stored in Global Database)
                 //If Customer Optima version is up to date
                 if(optimaMain.getMainOptima().getOptimaVersion().equals(DatabaseHolder.getInstance().getDbConf().getGlobalOptimaVersion())) {
                     //Update Customer Optima login details
@@ -283,13 +289,13 @@ public class LoginScreenController implements Initializable {
                     alert.setHeaderText("  Autoryzacja nie możliwa !");
                     alert.show();
                 }  //If input for Optima details is incorrect and can not login to Optima
-                }else{
-                    mainOptima.disconnectFromOptima();
-                    mainOptima = null;
-                    Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
-                    alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
-                    alert.show();
-                }
+            }else{
+                mainOptima.disconnectFromOptima();
+                mainOptima = null;
+                Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
+                alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
+                alert.show();
+            }
 
 
 
@@ -301,7 +307,7 @@ public class LoginScreenController implements Initializable {
         }
 
     }
-   /**
+    /**
      * Method responsible for geting from user Optima installation directory and setting it into variable optimaInstallationDir
      */
     @FXML
@@ -331,14 +337,14 @@ public class LoginScreenController implements Initializable {
                     stage.close();
                     Stage newStage = new Stage();
                     Parent root = FXMLLoader.load(getClass().getResource(("importXMLFileScreen.fxml")));
-                    Scene scene = new Scene(root);
+                    Scene scene = new Scene(root, 1024, 768);
                     newStage.initStyle(StageStyle.DECORATED);
                     newStage.setTitle("AIMPORTER");
                     newStage.setScene(scene);
                     newStage.show();
                 }catch(IOException e){
-                    System.out.println(e);
                     Alert alert = new Alert(Alert.AlertType.ERROR,"  Skontaktuj się z dostawcą oprogramowania !");
+                    alert.setTitle("Wystąpił błąd !");
                     alert.setHeaderText("  Wystąpił nieoczekiwany błąd !");
                     alert.show();
                 }
@@ -349,6 +355,7 @@ public class LoginScreenController implements Initializable {
                 mainOptima = null;
                 setLastSettingsButton.setDisable(true);
                 Alert alert = new Alert(Alert.AlertType.ERROR,"Twoja wersja programu nie jest aktualna w stosunku do programu Comarch Optima !\nSkontaktuj się z dostawcą oprogramowania");
+                alert.setTitle("Wystąpił błąd !");
                 alert.setHeaderText("  Autoryzacja nie możliwa !");alert.show();
 
             }
@@ -356,6 +363,7 @@ public class LoginScreenController implements Initializable {
             mainOptima.disconnectFromOptima();
             mainOptima = null;
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
+            alert.setTitle("Wystąpił błąd !");
             alert.setHeaderText("  Autoryzacja w Optima nie możliwa !");
             alert.show();
         }
@@ -365,7 +373,12 @@ public class LoginScreenController implements Initializable {
      * Method responsible for loading all Companys names from Optima, that are necessary for loggin into Optima.
      */
     private void loadCompanys(){
-        optimaCompanyName.getItems().add(0,"Test12");
+        Optima optemp = new Optima();
+        optimaCompanys = optemp.getCompanysFromOptima();
+        for (int i=0;i<optimaCompanys.length; i++){
+            optimaCompanyName.getItems().add(i,optimaCompanys[i]);
+            //System.out.println(optimaCompanys[i]);
+        }
     }
 
     /**

@@ -4,7 +4,6 @@ package pl.apisnet.backEND.XMLFiles;
 import com.jacob.com.Dispatch;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
@@ -20,6 +19,8 @@ public abstract class XMLImporter {
     protected final String optimaFindEanClassName = "findEan"; //Name of finding EAN function in DLL library created in C# using Optima API
     protected final String optimaAddNewItemClassName = "addItemByEan"; //Name of adding new Item function in DLL library crated in c# using Optima API
     protected final String optimaAddNewPzClassName = "addPZDocument"; //Name of adding new PZ function in DLL library created in c# using Optima API
+    protected final String optimaCheckItemCorrectness = "checkEanCorectness"; //Name of function in DLL to check if Item (with specific EAN number) readed from XMLFile
+    // has the same unit of measure as  item that is already stored in Optima
 
     protected String xmlFilePath;  //Path to XMLFILE to be parsed
     protected DocumentBuilderFactory factory;
@@ -69,12 +70,32 @@ public abstract class XMLImporter {
      */
     public void addMissingEans(){
         for (XMLPZPosition item : PZItemsList){
+            //If item is not avaliable in Optima
             if(!item.isAlreadyInOptima()){
                 addNewEan(item.getEAN(),item.getSymbol(),item.getNazwa(),item.getStawkaVat(),item.getjEW()); //Adding new Item into Optima
                 item.setAlreadyInOptima(true); //Changing item status (Already in Optima = True)
             }
         }
-    };
+    }
+
+    /**
+     * Method responsible for checking if Items, that are already stored in Optima has the same unit of measure as items readed from XML File
+     * If the measurement units differ then method is changing unit of measure to one, stored in Optima
+     * Invoking method @checkEanCorectness from OptimaLIBB.dll
+     */
+    protected void checkIfItemIsCorrect(XMLPZPosition item){
+        String itemCorrect = "ok";
+        String result = Dispatch.call(mainOptima.getOptimaProgramID(),optimaCheckItemCorrectness,item.getEAN().trim(),item.getjEW().trim()).getString();
+        //If result (unit of measure) is different than already stored in Optima, then change it into one, stored in optima
+        if (!result.equals(itemCorrect)){
+            item.setjEW(result);
+            item.setjEWWasIncorrect(true);
+        } else{
+            item.setjEWWasIncorrect(false);
+        }
+    }
+
+
 
     public List<XMLPZPosition> getPZItemsList() {
         return PZItemsList;

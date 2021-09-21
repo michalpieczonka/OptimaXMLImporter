@@ -11,9 +11,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -72,6 +75,8 @@ public class UserLoginScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        Node root = loginAnchorPane;
+        setGlobalEventHandler(root);
         //Hovers for buttons
         loginButton.setStyle(IDLE_BUTTON_STYLE);
         loginButton.setOnMouseEntered(e -> loginButton.setStyle(HOVERED_BUTTON_STYLE));
@@ -105,7 +110,20 @@ public class UserLoginScreenController implements Initializable {
         showPass.bind(showPassword.selectedProperty());
     }
 
-
+    private void setGlobalEventHandler(Node root){
+        root.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+            if (ev.getCode() == KeyCode.ENTER) {
+                loginButton.setStyle(HOVERED_BUTTON_STYLE);
+                loginButton.fire();
+                ev.consume();
+            }
+            else if (ev.getCode() == KeyCode.ESCAPE){
+                leaveButton.setStyle(HOVERED_BUTTON_STYLE);
+                leaveButton.fire();
+                ev.consume();
+            }
+        });
+    }
 
     @FXML
     void loginToImporter(ActionEvent event) {
@@ -120,7 +138,7 @@ public class UserLoginScreenController implements Initializable {
                     stage.close();
                     Stage newStage = new Stage();
                     Parent root = FXMLLoader.load(getClass().getResource(("loginScreen.fxml")));
-                    Scene scene = new Scene(root);
+                    Scene scene = new Scene(root,1024,768);
                     newStage.initStyle(StageStyle.DECORATED);
                     newStage.setTitle("AIMPORTER");
                     newStage.setScene(scene);
@@ -134,6 +152,7 @@ public class UserLoginScreenController implements Initializable {
 
             }else{
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Sprawdź poprawność wprowadzonych danych !");
+                alert.setTitle("Wystąpił błąd !");
                 alert.setHeaderText("  Autoryzacja nie możliwa !");
                 alert.show();
             }

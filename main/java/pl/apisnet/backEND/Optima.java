@@ -5,22 +5,27 @@ package pl.apisnet.backEND;
  */
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
+import com.jacob.com.SafeArray;
 import com.jacob.com.Variant;
 
 public class Optima {
     private final String optimaDLL = "OptimaLIBB.OptimaUtils"; //Class DLL library created in C# using Optima API
     private final String optimaLoginClassInDLL = "loginToOptima"; //Name of login function in DLL library created in C# using Optima API
     private final String optimaLogoutClassInDLL = "logoutFromOptima"; //Name of logout and unlock Optima function in DLL library created in C# using Optima API
-    private final String optimaVersionCheckerClassInDLL = "checkOptimaVersion"; //Name of checking version class in DLL library to check what is Optima Version
+    private final String optimaVersionCheckerClassInDLL = "checkOptimaVersion"; //Name of checking version funcion in DLL library to check what is Optima Version
+    private final String optimaCompanyNamesClassInDll = "getCompanys"; //Name of function in DLL to download all existing companys in Optima
+
 
     private boolean optimaConnection; //Flag responsible for checking if connection with Optima was sucessfully created
-
     private String optimaUserName;
     private String optimaUserPassword;
     private String optimaCompanyName;
     private String optimaInstallationPath;
     private ActiveXComponent optimaProgramID;
 
+    public Optima(){
+
+    }
 
     public Optima(String optimaUserName, String optimaUserPassword, String optimaCompanyName, String optimaInstallationPath) {
         this.optimaConnection = false;
@@ -79,5 +84,11 @@ public class Optima {
     public String getOptimaVersion(){
         Variant optimaVersion = Dispatch.call(optimaProgramID, optimaVersionCheckerClassInDLL, optimaInstallationPath);
         return optimaVersion.getString();
+    }
+
+    public String[] getCompanysFromOptima(){
+        optimaProgramID = new ActiveXComponent(optimaDLL);
+        SafeArray companys = Dispatch.call(optimaProgramID,optimaCompanyNamesClassInDll).toSafeArray();
+        return companys.toStringArray();
     }
 }

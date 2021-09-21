@@ -124,7 +124,10 @@ public class XMLExcelParser extends XMLImporter{
                         }
                     }
                 }
-
+                for(XMLPZPosition item: PZItemsList){
+                    if (item.isAlreadyInOptima())
+                        checkIfItemIsCorrect(item);
+                }
             }
             else {
                 throw new FileStructureException();
@@ -169,8 +172,5 @@ public class XMLExcelParser extends XMLImporter{
         }
         return avaliableSheets;
     }
-
-
-
 
 }

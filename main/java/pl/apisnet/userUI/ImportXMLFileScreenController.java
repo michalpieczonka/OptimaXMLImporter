@@ -47,14 +47,15 @@ public class ImportXMLFileScreenController implements Initializable {
     String fileToImportPath; //Path to selected file by User
 
     XMLImporter importer; //Abstract object for different importer types
-    int missingEansCounter;
+    int missingEansCounter, incorrectItemsCounter;
     List<String> correctJEWList = Arrays.asList("szt","godz","kg","litr","m","mkw","opak");
 
     boolean[] selectedFileType = new boolean[]{false,false,false}; // Array for storing logic for selected type of file
-                                                 // 1 - iHurt | 2 - Subiekt | 3 - Excel
+    // 1 - iHurt | 2 - Subiekt | 3 - Excel
 
     private static final String IDLE_BUTTON_STYLE = "-fx-background-color:  #fff; -fx-background-radius: 8px;";
     private static final String HOVERED_BUTTON_STYLE = "-fx-background-color: #f57500; -fx-background-radius: 8px;";
+    private final String errorHeaderString = "Wystąpił błąd";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -224,7 +225,7 @@ public class ImportXMLFileScreenController implements Initializable {
         dialog.show();
     }
 
-//Buttons controllers - responsible for importing actions
+    //Buttons controllers - responsible for importing actions
 //Import from EXCEL
     @FXML
     void importExcel(ActionEvent event) {
@@ -244,22 +245,25 @@ public class ImportXMLFileScreenController implements Initializable {
                     processImportButton.setVisible(true);
                 } else if (result.isEmpty()){
                     Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego arkusza !");
+                    alert.setTitle(errorHeaderString);
                     alert.setHeaderText("  Brak pliku !");
                     alert.show();
                 }
             } else{
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Niepoprawny typ pliku !");
                 alert.show();
             }
         }else{
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XLSX!");
+            alert.setTitle(errorHeaderString);
             alert.setHeaderText("  Brak pliku !");
             alert.show();
         }
     }
 
-//Import from iHurt
+    //Import from iHurt
     @FXML
     void importIHurt(ActionEvent event) {
         selectXmlFile();
@@ -269,17 +273,19 @@ public class ImportXMLFileScreenController implements Initializable {
                 importer = new XMLIHurtParser(fileToImportPath, mainOptima);
             } else{
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Niepoprawny typ pliku !");
                 alert.show();
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku XML !");
+            alert.setTitle(errorHeaderString);
             alert.setHeaderText("  Brak pliku !");
             alert.show();
         }
     }
 
-//Import from Subiekt
+    //Import from Subiekt
     @FXML
     void importSubiekt(ActionEvent event) {
         selectXmlFile();
@@ -289,49 +295,48 @@ public class ImportXMLFileScreenController implements Initializable {
                 importer = new XMLSubiektParser(fileToImportPath, mainOptima);
             } else{
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik posiada niepoprawną składnię !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Niepoprawny typ pliku !");
                 alert.show();
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie wybrano żadnego pliku EPP !");
+            alert.setTitle(errorHeaderString);
             alert.setHeaderText("  Brak pliku !");
             alert.show();
         }
     }
 
 
-//2 additional buttons responsible for reading from XML file and Processing readed data into Optima
+    //2 additional buttons responsible for reading from XML file and Processing readed data into Optima
 //ActionListener for importing XML file button -> When clicking import data from XML to App starts.
     @FXML
     void startImporting(ActionEvent event) {
         processImport();
     }
 
-//ActionListener for importing readed data (into Lists) to Optima
+    //ActionListener for importing readed data (into Lists) to Optima
     @FXML
     void addMissingEansToOptima(ActionEvent event) {
         addMissingEansButton.setDisable(true);
-       boolean userMistake = true; //flag responsible for checking if user did not click cancel or exit button
+        boolean userMistake = true; //flag responsible for checking if user did not click cancel or exit button
         while (userMistake == true){
-           for (XMLPZPosition item: importer.getPZItemsList()){
-               if (!item.isIsjEWCorrect()){
-                   ChoiceDialog<String> dialog = new ChoiceDialog<>("szt", correctJEWList);
-                   dialog.setTitle("Wymagane działanie");
-                   dialog.setHeaderText("Towar "+item.getSymbol()+" posiada niepoprawnie zdefiniowaną jednostkę miary !\n"+item.getjEW()+" jest niepoprawna !");
-                   dialog.setContentText("Aby usunąć problem dostosuj jednostkę miary:");
-                   Optional<String> result = dialog.showAndWait();
-                   if (result.isPresent()){
-                       item.setjEW(result.get());
-                       item.setIsjEWCorrect(true);
-                   }
-                   //else if (result.isEmpty()){
-                   //    System.out.println("Usunięto pozycje");
-                   //}
-               }
-           }
-           //If PZItemList still contains any item with wrong JEW while loop should run again
-           userMistake = importer.getPZItemsList().stream().anyMatch(p->p.isIsjEWCorrect() == false);
-       }
+            for (XMLPZPosition item: importer.getPZItemsList()){
+                if (!item.isIsjEWCorrect()){
+                    ChoiceDialog<String> dialog = new ChoiceDialog<>("szt", correctJEWList);
+                    dialog.setTitle("Wymagane działanie");
+                    dialog.setHeaderText("Towar "+item.getSymbol()+" posiada niepoprawnie zdefiniowaną jednostkę miary !\n"+item.getjEW()+" jest niepoprawna !");
+                    dialog.setContentText("Aby usunąć problem dostosuj jednostkę miary:");
+                    Optional<String> result = dialog.showAndWait();
+                    if (result.isPresent()){
+                        item.setjEW(result.get());
+                        item.setIsjEWCorrect(true);
+                    }
+                }
+            }
+            //If PZItemList still contains any item with wrong JEW while loop should run again
+            userMistake = importer.getPZItemsList().stream().anyMatch(p->p.isIsjEWCorrect() == false);
+        }
 
         //Using task to do not freez main JavaFX GUI thread
         loadLabel.setVisible(true);
@@ -345,6 +350,7 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION,"Wszystkie towary zostały pomyślnie dodane do Optima !");
+                alert.setTitle("Potwierdzenie");
                 alert.setHeaderText("  Sukces !");
                 alert.show();
                 loadLabel.setVisible(false);
@@ -358,6 +364,7 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 Alert alert = new Alert(Alert.AlertType.ERROR,"Nie udalo sie dodac wszystkich brakujących towarów do Optima !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Błąd !");
                 alert.show();
                 addPZDocumentButton.setDisable(true);
@@ -376,15 +383,17 @@ public class ImportXMLFileScreenController implements Initializable {
         loadLabel.setVisible(true);
         loadLabel.setText("Tworzenie dokumentu PZ");
         addMissingEansButton.setDisable(true);
+        addPZDocumentButton.setDisable(true);
         //If PZ document was successfully created
         imp.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION,"Dokument przyjęcia zewnętrznego został utworzony w Optima!");
+                alert.setTitle("Potwierdzenie");
                 alert.setHeaderText("  Sukces !");
                 alert.show();
-                addPZDocumentButton.setDisable(true);
+                //addPZDocumentButton.setDisable(true);
                 resetAllButton.setText("Zresetuj i importuj\nkolejny plik");
                 resetAllButton.setVisible(true);
             }
@@ -396,9 +405,10 @@ public class ImportXMLFileScreenController implements Initializable {
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Dokument przyjęcia zewnętrznego nie został utworzony w Optima ! Wystąpił błąd !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Błąd !");
                 alert.show();
-                addPZDocumentButton.setDisable(true);
+                //addPZDocumentButton.setDisable(true);
             }
         });
         imp.restart();
@@ -455,7 +465,8 @@ public class ImportXMLFileScreenController implements Initializable {
                             alert.setHeaderText("  Uwaga !");
                             alert.setTitle("Brakujace towary");
                             alert.show();
-                        }else{
+                        }
+                        else{
                             addMissingEansButton.setDisable(true);
                             addPZDocumentButton.setVisible(true);
                             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie znaleziono brakujących towarów. ");
@@ -464,10 +475,16 @@ public class ImportXMLFileScreenController implements Initializable {
                             alert.show();
                         }
 
+                        if (incorrectItemsCounter > 0){
+                            Alert alert = new Alert(Alert.AlertType.ERROR,"Wczytany plik zawierał towary, których jednostki miary różniły się od towarów znajdujących się w Optimie !\n"+
+                                    "Jednostki miary towarów zostały ujednolicone zgodnie z danymi pobranymi z Optimy !\nNiezgodne towary zostały oznaczone żółtym kolorem !");
+                            alert.setHeaderText("  Uwaga !");
+                            alert.show();
+                        }
+
 
                     }
                 });
-
                 //If file was read unsuccessfully
                 impXmlService.setOnFailed(new EventHandler<WorkerStateEvent>() {
                     @Override
@@ -477,17 +494,17 @@ public class ImportXMLFileScreenController implements Initializable {
                 });
                 impXmlService.restart();
 
-
-
             } catch (Exception e){
                 System.out.println(e);
                 Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik XML posiada niepoprawną składnie !");
+                alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Błąd krytyczny !");
                 alert.show();
             }
         }
         else{
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie udało się połączyć z Optima \n  Sprawdz ustawienia !");
+            alert.setTitle(errorHeaderString);
             alert.setHeaderText("  Błąd krytyczny !");
             alert.show();
         }
@@ -535,6 +552,9 @@ public class ImportXMLFileScreenController implements Initializable {
                     setStyle("-fx-background-color: #baffba;");
                 else
                     setStyle("-fx-background-color: #CD5C5C;");
+
+                if (item != null && (item).getjEWWasIncorrect())
+                    setStyle("-fx-background-color: #CCCC33;");
             }
         });
     }
@@ -544,9 +564,13 @@ public class ImportXMLFileScreenController implements Initializable {
      */
     private void checkIfItemListCointainsMissingEans(){
         missingEansCounter = 0;
+        incorrectItemsCounter = 0;
         for (int i=0; i<importer.getPZItemsList().size(); i++){
             if (!importer.getPZItemsList().get(i).isAlreadyInOptima()){
                 missingEansCounter ++;
+            }
+            if (importer.getPZItemsList().get(i).getjEWWasIncorrect()){
+                incorrectItemsCounter ++;
             }
         }
     }

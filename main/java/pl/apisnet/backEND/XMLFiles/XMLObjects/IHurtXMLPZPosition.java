@@ -1,12 +1,8 @@
 package pl.apisnet.backEND.XMLFiles.XMLObjects;
 
 public class IHurtXMLPZPosition extends XMLPZPosition {
-  // private String symbol;
-  // private int ilosc;
-  // private double cena;
-  // private String EAN;
 
-    public IHurtXMLPZPosition(String symbol, int ilosc, double cena, String EAN, String nazwa,String jEW, int stawkaVat, boolean isAlreadyInOptima, boolean isjEWCorrect) {
+    public IHurtXMLPZPosition(String symbol, int ilosc, double cena, String EAN, String nazwa,String jEW, int stawkaVat, boolean isAlreadyInOptima, boolean isjEWCorrect, boolean jEWWasIncorrect ) {
         this.symbol = symbol;
         this.ilosc = ilosc;
         this.cena = cena;
@@ -16,6 +12,7 @@ public class IHurtXMLPZPosition extends XMLPZPosition {
         this.nazwa = nazwa;
         this.isAlreadyInOptima = isAlreadyInOptima;
         this.isjEWCorrect = isjEWCorrect;
+        this.jEWWasIncorrect = jEWWasIncorrect;
     }
 
     public int getStawkaVat(){return stawkaVat;}

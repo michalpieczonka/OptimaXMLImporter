@@ -11,6 +11,15 @@ public abstract class XMLPZPosition {
     protected boolean isAlreadyInOptima;
     protected boolean isjEWCorrect;
 
+    protected boolean jEWWasIncorrect;
+
+    public boolean getjEWWasIncorrect() {
+        return jEWWasIncorrect;
+    }
+
+    public void setjEWWasIncorrect(boolean jEWWasIncorrect) {
+        this.jEWWasIncorrect = jEWWasIncorrect;
+    }
 
     public boolean isAlreadyInOptima(){
         return isAlreadyInOptima;
