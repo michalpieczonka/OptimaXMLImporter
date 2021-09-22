@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pl.apisnet.backEND.Exceptions.FileStructureException;
+import pl.apisnet.backEND.Exceptions.ImportPZException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.ExcelXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
@@ -143,7 +144,7 @@ public class XMLExcelParser extends XMLImporter{
     }
 
     @Override
-    public void addNewPZ() {
+    public void addNewPZ() throws ImportPZException{
         int listOfItemsSize = PZItemsList.size();
         ExcelXMLPZPosition[] tab = PZItemsList.toArray(new ExcelXMLPZPosition[0]);
         SafeArray eansArray = new SafeArray (Variant.VariantString,listOfItemsSize);
@@ -154,7 +155,9 @@ public class XMLExcelParser extends XMLImporter{
             amountArray.setInt(i,tab[i].getIlosc());
             pricesArray.setDouble(i, tab[i].getCena());
         }
-        Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray);
+        boolean operationResult = Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray).getBoolean();
+        if (!operationResult)
+            throw new ImportPZException();
     }
 
 

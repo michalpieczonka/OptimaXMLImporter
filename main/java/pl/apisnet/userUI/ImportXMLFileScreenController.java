@@ -3,6 +3,7 @@ package pl.apisnet.userUI;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXRadioButton;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -73,6 +74,7 @@ public class ImportXMLFileScreenController implements Initializable {
 
     @FXML
     private Label loadLabel;
+
 
     @FXML
     private AnchorPane mainAnchorPane;

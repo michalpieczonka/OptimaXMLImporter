@@ -4,6 +4,7 @@ import com.jacob.com.Dispatch;
 import com.jacob.com.SafeArray;
 import com.jacob.com.Variant;
 import pl.apisnet.backEND.Exceptions.FileStructureException;
+import pl.apisnet.backEND.Exceptions.ImportPZException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.SubiektXMLPZPosition;
@@ -149,7 +150,7 @@ public class XMLSubiektParser extends XMLImporter{
      * Parameters - list of items in XML file
      */
     @Override
-    public void addNewPZ() {
+    public void addNewPZ() throws ImportPZException {
         int listOfItemsSize = PZItemsList.size();
         SubiektXMLPZPosition[] tab = PZItemsList.toArray(new SubiektXMLPZPosition[0]);
         SafeArray eansArray = new SafeArray (Variant.VariantString,listOfItemsSize);
@@ -160,6 +161,8 @@ public class XMLSubiektParser extends XMLImporter{
             amountArray.setInt(i,tab[i].getIlosc());
             pricesArray.setDouble(i, tab[i].getCena());
         }
-        Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray);
+        boolean operationResult = Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray).getBoolean();
+        if (!operationResult)
+            throw new ImportPZException();
     }
 }

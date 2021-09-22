@@ -4,6 +4,7 @@ import com.jacob.com.Dispatch;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 
@@ -83,8 +84,9 @@ class XMLIHurtParserTest {
     void exceptionShouldBeThrownWhenInputFileHasIncorrectSynthax(){
         mainOptima = new Optima("Admin","","Test3","C:/Program Files (x86)/Comarch ERP Optima");
         mainOptima.connectToOptima();
-        iHurt = new XMLIHurtParser("dodatkowexml/wrongSynthaxtestXMLFile.xml",mainOptima);
+        iHurt = new XMLIHurtParser("C:\\Users\\Michal\\Desktop\\Optima wszystko\\dodatkowexml\\wrongSynthaxtestXMLFile.xml",mainOptima);
         assertThrows(FileStructureException.class,()->iHurt.readXmlFileHeaders());
     }
+
 
 }

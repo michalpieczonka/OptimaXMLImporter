@@ -19,6 +19,9 @@ import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -40,6 +43,29 @@ public class XMLIHurtParser extends XMLImporter {
      */
     @Override
     public void readXmlFileHeaders() throws FileStructureException {
+        try{
+            System.out.println(xmlFilePath);
+            //First check what type of file was given by Customer
+            BufferedReader br = new BufferedReader(new FileReader(xmlFilePath));
+            String basicLine = br.readLine();
+            br.close();
+            basicLine = basicLine.substring(0,2); //Get only first two characters
+            //Based on first two characters, decide which parser use
+            switch (basicLine) {
+                case "<?" -> readXMLIHurtSyntax(); //For typical IHurt xml file
+                case "<F" -> readXMLUnknownSyntax(); //For extra random xml file
+                default -> throw new FileStructureException(); //If none matches then throw exception
+            }
+        } catch (IOException e){
+            System.out.println(e);
+        } catch (SAXException e) {
+            throw new FileStructureException();
+        }
+
+
+    }
+
+    private void readXMLIHurtSyntax() throws FileStructureException, SAXException {
         try{
             factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -80,14 +106,56 @@ public class XMLIHurtParser extends XMLImporter {
 
         }catch (ParserConfigurationException e){
             e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readXMLUnknownSyntax() throws FileStructureException, SAXException{
+        try{
+            factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            xmlFile = builder.parse(xmlFilePath);
+            elementsInXml_Pozycja = xmlFile.getElementsByTagName("Pozycja");
+            for (int i = 0; i  < elementsInXml_Pozycja.getLength(); i++){
+                Node headerItem = elementsInXml_Pozycja.item(i);
+                if (headerItem.getNodeType() == Node.ELEMENT_NODE){
+                    Element Pozycja = (Element) headerItem;
+                    //If item with given EAN number not exists
+                    if (!checkIfEanNumbersExists(Pozycja.getElementsByTagName("EAN").item(0).getTextContent())){
+                        if(UnitsOfMeasure.contains(Pozycja.getElementsByTagName("JM").item(0).getTextContent())){
+                            //Add this item to items list in PZ
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),(int)Float.parseFloat(Pozycja.getElementsByTagName("Ilosc").item(0).getTextContent()),Double.parseDouble(Pozycja.getElementsByTagName("Cena").item(0).getTextContent()),Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),Pozycja.getElementsByTagName("Nazwa").item(0).getTextContent(),Pozycja.getElementsByTagName("JM").item(0).getTextContent(),Integer.parseInt(Pozycja.getElementsByTagName("StawkaVAT").item(0).getTextContent()), false,true,false));
+                        } else{ //Here it can stack because if jEW is not same as oryginal in Optima then its problem
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),(int)Float.parseFloat(Pozycja.getElementsByTagName("Ilosc").item(0).getTextContent()),Double.parseDouble(Pozycja.getElementsByTagName("Cena").item(0).getTextContent()),Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),Pozycja.getElementsByTagName("Nazwa").item(0).getTextContent(),Pozycja.getElementsByTagName("JM").item(0).getTextContent(),Integer.parseInt(Pozycja.getElementsByTagName("StawkaVAT").item(0).getTextContent()), false,false,false));
+                        }
+                    }
+                    else{
+                        //If item is already in Optima, then only add this item to items list in PZ
+                        if(UnitsOfMeasure.contains(Pozycja.getElementsByTagName("JM").item(0).getTextContent())){
+                            //Add this item to items list in PZ
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),(int)Float.parseFloat(Pozycja.getElementsByTagName("Ilosc").item(0).getTextContent()),Double.parseDouble(Pozycja.getElementsByTagName("Cena").item(0).getTextContent()),Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),Pozycja.getElementsByTagName("Nazwa").item(0).getTextContent(),Pozycja.getElementsByTagName("JM").item(0).getTextContent(),Integer.parseInt(Pozycja.getElementsByTagName("StawkaVAT").item(0).getTextContent()), true,true,true));
+                        } else{
+                            PZItemsList.add(new IHurtXMLPZPosition(Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),(int)Float.parseFloat(Pozycja.getElementsByTagName("Ilosc").item(0).getTextContent()),Double.parseDouble(Pozycja.getElementsByTagName("Cena").item(0).getTextContent()),Pozycja.getElementsByTagName("EAN").item(0).getTextContent(),Pozycja.getElementsByTagName("Nazwa").item(0).getTextContent(),Pozycja.getElementsByTagName("JM").item(0).getTextContent(),Integer.parseInt(Pozycja.getElementsByTagName("StawkaVAT").item(0).getTextContent()), true,false,true));
+                        }
+                    }
+                }
+            }
+            if (PZItemsList.size() == 0)
+                throw new FileStructureException();
+            else{
+                for(XMLPZPosition item: PZItemsList){
+                    if (item.isAlreadyInOptima())
+                        checkIfItemIsCorrect(item);
+                }
+            }
+
+        }catch (ParserConfigurationException e){
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 
     /**
      * Adding new PZ to Optima
