@@ -3,6 +3,7 @@ package pl.apisnet.backEND.XMLFiles;
 import com.jacob.com.Dispatch;
 import com.jacob.com.SafeArray;
 import com.jacob.com.Variant;
+import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.SubiektXMLPZPosition;
@@ -129,9 +130,13 @@ public class XMLSubiektParser extends XMLImporter{
                 }
 
             }
-            for(XMLPZPosition item: PZItemsList){
-                if (item.isAlreadyInOptima())
-                    checkIfItemIsCorrect(item);
+            if (PZItemsList.size() == 0)
+                throw new FileStructureException();
+            else{
+                for(XMLPZPosition item: PZItemsList){
+                    if (item.isAlreadyInOptima())
+                        checkIfItemIsCorrect(item);
+                }
             }
 
         }catch (Exception e){ }

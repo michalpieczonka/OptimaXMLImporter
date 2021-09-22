@@ -10,6 +10,8 @@ import com.jacob.com.Variant;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import pl.apisnet.backEND.Exceptions.FileStructureException;
+import pl.apisnet.backEND.Exceptions.ImportPZException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.IHurtXMLPZPosition;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
@@ -37,7 +39,7 @@ public class XMLIHurtParser extends XMLImporter {
      * The most important function. Reading xml file, and invoking other necessary methods to deal with given XML File
      */
     @Override
-    public void readXmlFileHeaders() {
+    public void readXmlFileHeaders() throws FileStructureException {
         try{
             factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -67,9 +69,13 @@ public class XMLIHurtParser extends XMLImporter {
                     }
                 }
             }
-            for(XMLPZPosition item: PZItemsList){
-                if (item.isAlreadyInOptima())
-                    checkIfItemIsCorrect(item);
+            if (PZItemsList.size() == 0)
+                throw new FileStructureException();
+            else{
+                for(XMLPZPosition item: PZItemsList){
+                    if (item.isAlreadyInOptima())
+                        checkIfItemIsCorrect(item);
+                }
             }
 
         }catch (ParserConfigurationException e){
@@ -89,7 +95,7 @@ public class XMLIHurtParser extends XMLImporter {
      * Parameters - list of items in XML file
      */
     @Override
-    public void addNewPZ() {
+    public void addNewPZ() throws ImportPZException {
         int listOfItemsSize = PZItemsList.size();
         IHurtXMLPZPosition[] tab = PZItemsList.toArray(new IHurtXMLPZPosition[0]);
         SafeArray eansArray = new SafeArray (Variant.VariantString,listOfItemsSize);
@@ -97,11 +103,13 @@ public class XMLIHurtParser extends XMLImporter {
         SafeArray pricesArray = new SafeArray (Variant.VariantDouble, listOfItemsSize);
         for (int i=0; i < listOfItemsSize; i++){
             eansArray.setString(i, tab[i].getEAN());
-            //eansArray.setString(i, tab[i].getSymbol());
             amountArray.setInt(i,tab[i].getIlosc());
             pricesArray.setDouble(i, tab[i].getCena());
         }
-        Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray);
+        //Operation result = true if PZ was successfully created | false = if PZ was not successfully created
+        boolean operationResult =  Dispatch.call(mainOptima.getOptimaProgramID(), optimaAddNewPzClassName, eansArray, amountArray, pricesArray).getBoolean();
+        if (!operationResult)
+            throw new ImportPZException();
     }
 
 

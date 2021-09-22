@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.XMLFiles.Services.AddPZDocumentService;
 import pl.apisnet.backEND.XMLFiles.Services.ImportItemsToOptimaService;
 import pl.apisnet.backEND.XMLFiles.Services.ImportXmlService;
@@ -404,11 +405,11 @@ public class ImportXMLFileScreenController implements Initializable {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 loadLabel.setVisible(false);
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Dokument przyjęcia zewnętrznego nie został utworzony w Optima ! Wystąpił błąd !");
+                Alert alert = new Alert(Alert.AlertType.ERROR,"Dokument przyjęcia zewnętrznego nie został utworzony w Optima ! Wystąpił błąd !");
                 alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Błąd !");
                 alert.show();
-                //addPZDocumentButton.setDisable(true);
+                resetImportDetails();
             }
         });
         imp.restart();
@@ -436,7 +437,6 @@ public class ImportXMLFileScreenController implements Initializable {
      */
     private void processImport(){
         if (mainOptima.checkOptimaConnection()){
-            try{
                 //Disabling all other buttons to avoid creating PZ with missing EANS(Items)
                 processImportButton.setDisable(true);
                 subiektButton.setDisable(true);
@@ -490,17 +490,15 @@ public class ImportXMLFileScreenController implements Initializable {
                     @Override
                     public void handle(WorkerStateEvent workerStateEvent) {
                         loadLabel.setVisible(false);
+                        Alert alert = new Alert(Alert.AlertType.ERROR," Wystąpił problem z przetworzeniem wczytanego pliku !\n Upewnij się, że jego składnia jest poprawna !");
+                        alert.setTitle(errorHeaderString);
+                        alert.setHeaderText("  Błąd krytyczny !");
+                        alert.show();
+                        resetImportDetails();
                     }
                 });
                 impXmlService.restart();
 
-            } catch (Exception e){
-                System.out.println(e);
-                Alert alert = new Alert(Alert.AlertType.ERROR,"  Wybrany plik XML posiada niepoprawną składnie !");
-                alert.setTitle(errorHeaderString);
-                alert.setHeaderText("  Błąd krytyczny !");
-                alert.show();
-            }
         }
         else{
             Alert alert = new Alert(Alert.AlertType.ERROR,"  Nie udało się połączyć z Optima \n  Sprawdz ustawienia !");

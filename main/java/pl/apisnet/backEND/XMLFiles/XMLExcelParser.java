@@ -124,9 +124,13 @@ public class XMLExcelParser extends XMLImporter{
                         }
                     }
                 }
-                for(XMLPZPosition item: PZItemsList){
-                    if (item.isAlreadyInOptima())
-                        checkIfItemIsCorrect(item);
+                if (PZItemsList.size() == 0)
+                    throw new FileStructureException();
+                else{
+                    for(XMLPZPosition item: PZItemsList){
+                        if (item.isAlreadyInOptima())
+                            checkIfItemIsCorrect(item);
+                    }
                 }
             }
             else {
