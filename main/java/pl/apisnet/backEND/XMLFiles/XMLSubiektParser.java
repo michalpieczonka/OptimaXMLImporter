@@ -134,9 +134,18 @@ public class XMLSubiektParser extends XMLImporter{
             if (PZItemsList.size() == 0)
                 throw new FileStructureException();
             else{
-                for(XMLPZPosition item: PZItemsList){
-                    if (item.isAlreadyInOptima())
-                        checkIfItemIsCorrect(item);
+                if (itemSymbolAsEan){
+                    for (XMLPZPosition item: PZItemsList){
+                        item.setSymbol(item.getEAN());
+                        if (item.isAlreadyInOptima())
+                            checkIfItemIsCorrect(item);
+                    }
+                }
+                else{
+                    for(XMLPZPosition item: PZItemsList){
+                        if (item.isAlreadyInOptima())
+                            checkIfItemIsCorrect(item);
+                    }
                 }
             }
 

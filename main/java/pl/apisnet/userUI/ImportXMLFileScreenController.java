@@ -75,6 +75,8 @@ public class ImportXMLFileScreenController implements Initializable {
     @FXML
     private Label loadLabel;
 
+    @FXML
+    private JFXRadioButton eanAsSymbolButton;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -235,6 +237,7 @@ public class ImportXMLFileScreenController implements Initializable {
         selectXmlFile();
         if (!fileToImportPath.isBlank()){
             if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("xls") || fileToImportPath.substring(fileToImportPath.length() - 4).equals("xlsx") ){
+                eanAsSymbolButton.setVisible(true);
                 importer = new XMLExcelParser(fileToImportPath,mainOptima);
                 List<String> avliableSheets = ((XMLExcelParser)importer).getAvailableSheets();
 
@@ -272,6 +275,7 @@ public class ImportXMLFileScreenController implements Initializable {
         selectXmlFile();
         if(!fileToImportPath.isBlank()){
             if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("xml")){
+                eanAsSymbolButton.setVisible(true);
                 processImportButton.setVisible(true);
                 importer = new XMLIHurtParser(fileToImportPath, mainOptima);
             } else{
@@ -294,6 +298,7 @@ public class ImportXMLFileScreenController implements Initializable {
         selectXmlFile();
         if(!fileToImportPath.isBlank()){
             if(fileToImportPath.substring(fileToImportPath.length() - 3).equals("epp")){
+                eanAsSymbolButton.setVisible(true);
                 processImportButton.setVisible(true);
                 importer = new XMLSubiektParser(fileToImportPath, mainOptima);
             } else{
@@ -366,12 +371,13 @@ public class ImportXMLFileScreenController implements Initializable {
         imp.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,"Nie udalo sie dodac wszystkich brakujących towarów do Optima !");
+                Alert alert = new Alert(Alert.AlertType.ERROR,"Nie udalo sie dodac wszystkich brakujących towarów do Optima!\nPrawdopodobnie w Optima istnieją już duplikaty towarów o takim samym symbolu !\nWykorzystaj opcje 'Ean jako symbol'!");
                 alert.setTitle(errorHeaderString);
                 alert.setHeaderText("  Błąd !");
                 alert.show();
                 addPZDocumentButton.setDisable(true);
                 loadLabel.setVisible(false);
+                resetImportDetails();
             }
         });
         imp.restart();
@@ -439,6 +445,10 @@ public class ImportXMLFileScreenController implements Initializable {
      */
     private void processImport(){
         if (mainOptima.checkOptimaConnection()){
+                //Checking if Customer wants EAN code to be Symbol of items
+                eanAsSymbolButton.setVisible(false);
+                importer.setItemSymbolAsEan(eanAsSymbolButton.isSelected());
+
                 //Disabling all other buttons to avoid creating PZ with missing EANS(Items)
                 processImportButton.setDisable(true);
                 subiektButton.setDisable(true);
@@ -579,6 +589,8 @@ public class ImportXMLFileScreenController implements Initializable {
      * Method responsible for hovering buttons
      */
     private void makeDesign(){
+        eanAsSymbolButton.setVisible(false);
+
         optimaFirmName.setTextFill(Color.rgb(245,117,0));
         processImportButton.setVisible(false);
         addMissingEansButton.setVisible(false);
@@ -607,6 +619,7 @@ public class ImportXMLFileScreenController implements Initializable {
     }
 
     private void resetImportDetails(){
+        eanAsSymbolButton.setSelected(false);
         itemsTable.getColumns().clear();
         importer.getPZItemsList().clear();
         fileToImportPath = "";

@@ -149,7 +149,17 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </JFXButton>
-                  <JFXRadioButton fx:id="eanAsSymbolButton" layoutX="232.0" layoutY="47.0" text="Ustaw EAN jako symbol" />
+                  <JFXRadioButton fx:id="eanAsSymbolButton" layoutX="236.0" layoutY="60.0" prefHeight="19.0" prefWidth="245.0" text="Ustaw EAN jako SYMBOL towaru" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                     <selectedColor>
+                        <Color red="0.8470588326454163" green="0.3607843220233917" blue="0.1725490242242813" />
+                     </selectedColor>
+                     <unSelectedColor>
+                        <Color red="1.0" green="1.0" blue="1.0" />
+                     </unSelectedColor>
+                  </JFXRadioButton>
                </children>
                <effect>
                   <DropShadow>

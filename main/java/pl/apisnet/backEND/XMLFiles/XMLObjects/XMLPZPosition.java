@@ -33,6 +33,10 @@ public abstract class XMLPZPosition {
         return cena;
     }
 
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
     public String getSymbol() {
         return symbol;
     }

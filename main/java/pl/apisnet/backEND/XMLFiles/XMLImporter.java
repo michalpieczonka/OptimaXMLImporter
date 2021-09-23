@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import pl.apisnet.backEND.Exceptions.FileStructureException;
 import pl.apisnet.backEND.Exceptions.ImportPZException;
+import pl.apisnet.backEND.Exceptions.addNewEanException;
 import pl.apisnet.backEND.Optima;
 import pl.apisnet.backEND.XMLFiles.XMLObjects.XMLPZPosition;
 
@@ -29,6 +30,7 @@ public abstract class XMLImporter {
     protected Document xmlFile;
     protected NodeList elementsInXml_Pozycja;  //Each single tag in XML FILE -> this case -> 1 single item between <Pozycje> ... </Pozycje>
     protected Optima mainOptima;
+    protected boolean itemSymbolAsEan;
 
     protected List<XMLPZPosition> PZItemsList; //List of items readed from file, imported by User
     protected List<String> UnitsOfMeasure = Arrays.asList("szt","Szt","SZT","godz","Godz","kg","Kg","litr","Litr","m","M","mkw","Mkw","opak","Opak"); //List of units of measure available in Optima
@@ -53,8 +55,10 @@ public abstract class XMLImporter {
      * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
      * Parameters - necessary components of the item (ean,symbol,name,VatRate,unitOfMeasure)
      */
-    public void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure){
-        Dispatch.call(mainOptima.getOptimaProgramID(),optimaAddNewItemClassName,eanNumber,symbol,itemName,vatRate,unitOfMeasure);
+    public void addNewEan(String eanNumber, String symbol, String itemName, int vatRate, String unitOfMeasure) throws addNewEanException {
+        boolean operationResult = Dispatch.call(mainOptima.getOptimaProgramID(),optimaAddNewItemClassName,eanNumber,symbol,itemName,vatRate,unitOfMeasure).getBoolean();
+        if (!operationResult)
+            throw new addNewEanException();
     };
 
 
@@ -69,7 +73,7 @@ public abstract class XMLImporter {
      * Adding missing EANS to Optima
      * Invoking method @optimaAddNewItemClassName from OptimaLIBB.dll
      */
-    public void addMissingEans(){
+    public void addMissingEans() throws addNewEanException {
         for (XMLPZPosition item : PZItemsList){
             //If item is not avaliable in Optima
             if(!item.isAlreadyInOptima()){
@@ -104,6 +108,10 @@ public abstract class XMLImporter {
 
     public List<String> getUnitsOfMeasure(){
         return UnitsOfMeasure;
+    }
+
+    public void setItemSymbolAsEan(boolean itemSymbolAsEan){
+        this.itemSymbolAsEan = itemSymbolAsEan;
     }
 
 }
