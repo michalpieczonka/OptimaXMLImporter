@@ -1,5 +1,5 @@
-# Computational-Geometry-Helper
-An Application which was a project for one of the subjects realized during the studies - computational geometry. 
+# Optima XML documents Importer
+An application the purpose of which was/is to facilitate the cooperation of the accounting department of medium companies with the Comarch ERP Optima system. 
 
 ## Table of contents
 * [General info](#general-info)
